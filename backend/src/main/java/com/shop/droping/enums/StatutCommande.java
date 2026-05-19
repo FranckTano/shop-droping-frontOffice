@@ -2,10 +2,10 @@ package com.shop.droping.enums;
 
 public enum StatutCommande {
     EN_ATTENTE("En attente"),
-    CONFIRMEE("Confirmée"),
-    EN_LIVRAISON("En livraison"),
+    VALIDEE("Validée"),
     LIVREE("Livrée"),
-    ANNULEE("Annulée");
+    ANNULEE("Annulée"),
+    STANDBY("Stand-by");
 
     private final String libelle;
 
@@ -17,4 +17,3 @@ public enum StatutCommande {
         return libelle;
     }
 }
-

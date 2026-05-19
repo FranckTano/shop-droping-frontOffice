@@ -157,9 +157,31 @@ public class ProduitFacade {
         Produit produit = produitRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Produit non trouvé avec l'ID: " + id));
 
-        // Soft delete
         produit.setActif(false);
         produitRepository.save(produit);
+    }
+
+    public List<ProduitDto> listerProduitsArchives() {
+        return produitRepository.findByActifFalse()
+            .stream()
+            .map(ProduitDto::fromEntity)
+            .toList();
+    }
+
+    @Transactional
+    public ProduitDto restaurer(Long id) {
+        Produit produit = produitRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Produit non trouvé avec l'ID: " + id));
+        produit.setActif(true);
+        return ProduitDto.fromEntity(produitRepository.save(produit));
+    }
+
+    @Transactional
+    public ProduitDto changerStatutActif(Long id, boolean actif) {
+        Produit produit = produitRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Produit non trouvé avec l'ID: " + id));
+        produit.setActif(actif);
+        return ProduitDto.fromEntity(produitRepository.save(produit));
     }
 }
 

@@ -117,7 +117,7 @@ public class CommandeFacade {
 
         String numeroWhatsApp = configurationRepository.findByCle(Configuration.CLE_WHATSAPP_NUMERO)
             .map(Configuration::getValeur)
-            .orElse("+22900000000");
+            .orElse("+2250799136306");
 
         String nomBoutique = configurationRepository.findByCle(Configuration.CLE_NOM_BOUTIQUE)
             .map(Configuration::getValeur)
@@ -179,7 +179,7 @@ public class CommandeFacade {
                                                      String clientNom, String clientTelephone) {
         String numeroWhatsApp = configurationRepository.findByCle(Configuration.CLE_WHATSAPP_NUMERO)
             .map(Configuration::getValeur)
-            .orElse("+22900000000");
+            .orElse("+2250799136306");
 
         String nomBoutique = configurationRepository.findByCle(Configuration.CLE_NOM_BOUTIQUE)
             .map(Configuration::getValeur)

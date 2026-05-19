@@ -4,6 +4,7 @@ import com.shop.droping.enums.StatutCommande;
 import com.shop.droping.facade.CommandeFacade;
 import com.shop.droping.presentation.dto.CommandeDto;
 import com.shop.droping.presentation.dto.CreerCommandeRequest;
+import com.shop.droping.presentation.dto.WhatsAppLinkDto;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,5 +34,10 @@ public class CommandeController {
     @PutMapping("/{id}/statut")
     public CommandeDto updateStatutCommande(@PathVariable Long id, @RequestBody String statut) {
         return commandeFacade.mettreAJourStatut(id, StatutCommande.valueOf(statut));
+    }
+
+    @GetMapping("/{id}/lien-whatsapp")
+    public WhatsAppLinkDto getLienWhatsApp(@PathVariable Long id) {
+        return commandeFacade.genererLienWhatsApp(id);
     }
 }

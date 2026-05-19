@@ -13,4 +13,8 @@ export class CommandeService {
   creerCommande(commande: any): Observable<any> {
     return this.http.post<any>(this.apiUrl, commande);
   }
+
+  getLienWhatsApp(commandeId: number): Observable<{ numero: string; message: string; lienWhatsApp: string }> {
+    return this.http.get<{ numero: string; message: string; lienWhatsApp: string }>(`${this.apiUrl}/${commandeId}/lien-whatsapp`);
+  }
 }

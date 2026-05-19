@@ -26,18 +26,18 @@ export class WhatsappService {
 
     commande.articles.forEach((article: any, index: number) => {
       message += `${index + 1}. *${article.produitNom || ('Produit ID: ' + article.produitId)}*\n`;
-        message += `   📏 Taille: ${article.options.taille}\n`;
-        message += `   🎨 Couleur: ${article.options.couleur}\n`;
-        if (article.options.badgesOfficiels) {
-            message += `   ✅ Badges officiels\n`;
-        }
-        if (article.options.flocage) {
+      message += `   📏 Taille: ${article.options.taille}\n`;
+      message += `   🎨 Couleur: ${article.options.couleur}\n`;
+      if (article.options.badgesOfficiels) {
+          message += `   ✅ Badges officiels\n`;
+      }
+      if (article.options.flocage) {
         const detailFlocage = [article.options.flocageNom, article.options.flocageNumero]
           .filter((value: string) => !!value && value.trim().length > 0)
           .join(' ');
         message += `   🧵 Flocage: ${detailFlocage || article.options.flocageTexte || 'Oui'}\n`;
-        }
-        message += `   🔢 Quantité: ${article.quantite}\n\n`;
+      }
+      message += `   🔢 Quantité: ${article.quantite}\n\n`;
     });
 
     message += `━━━━━━━━━━━━━━━━━━━━━\n`;

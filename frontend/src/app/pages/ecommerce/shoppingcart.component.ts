@@ -17,11 +17,13 @@ import { PanierService, ArticlePanier } from '@services/panier.service';
 import { WhatsappService } from '@services/whatsapp.service';
 import { CommandeService } from '@services/commande.service';
 import { ProduitService } from '@services/produit.service';
+import { AdresseMapComponent, AdresseInfo } from './adresse-map.component';
 
 interface InfosClient {
     nom: string;
     telephone: string;
     adresse: string;
+    lienGps: string;
     notes: string;
 }
 
@@ -40,7 +42,8 @@ interface InfosClient {
         TextareaModule,
         CheckboxModule,
         MultiSelectModule,
-        ToastModule
+        ToastModule,
+        AdresseMapComponent
     ],
     providers: [ConfirmationService, MessageService],
     template: `
@@ -127,13 +130,15 @@ interface InfosClient {
                                 <div *ngIf="article.options.flocage" class="flocage-grid">
                                     <input
                                         pInputText
-                                        [ngModel]="article.options.flocageNom || ''"
-                                        (ngModelChange)="changerFlocageNom(article, $event)"
+                                        #fNomInput
+                                        [value]="article.options.flocageNom || ''"
+                                        (blur)="changerFlocageNom(article, fNomInput.value)"
                                         placeholder="Nom flocage (optionnel)" />
                                     <input
                                         pInputText
-                                        [ngModel]="article.options.flocageNumero || ''"
-                                        (ngModelChange)="changerFlocageNumero(article, $event)"
+                                        #fNumInput
+                                        [value]="article.options.flocageNumero || ''"
+                                        (blur)="changerFlocageNumero(article, fNumInput.value)"
                                         placeholder="Numero flocage (optionnel)" />
                                 </div>
                             </div>
@@ -180,7 +185,7 @@ interface InfosClient {
             </div>
         </section>
 
-        <p-dialog header="Finalisez votre commande" [(visible)]="dialogCommandeVisible" [modal]="true" [style]="{width: '520px'}" [draggable]="false" [resizable]="false">
+        <p-dialog header="Finalisez votre commande" [(visible)]="dialogCommandeVisible" [modal]="true" [style]="{width: 'min(95vw, 680px)'}" [draggable]="false" [resizable]="false">
             <div class="space-y-4">
                 <p>Renseignez vos coordonnees pour confirmer votre commande.</p>
 
@@ -195,8 +200,14 @@ interface InfosClient {
                 </div>
 
                 <div class="field">
-                    <label for="adresse" class="block font-medium mb-2">Adresse de livraison *</label>
-                    <input id="adresse" type="text" pInputText [(ngModel)]="infosClient.adresse" class="w-full" placeholder="Votre adresse complete" />
+                    <label class="block font-medium mb-2">Adresse de livraison *</label>
+                    <app-adresse-map
+                        [active]="dialogCommandeVisible"
+                        (adresseChoisie)="onAdresseChoisie($event)">
+                    </app-adresse-map>
+                    <input id="adresse" type="text" pInputText
+                           [(ngModel)]="infosClient.adresse" class="w-full mt-2"
+                           placeholder="Adresse auto-remplie ou saisir manuellement" />
                 </div>
 
                 <div class="field">
@@ -519,6 +530,7 @@ export class ShoppingCartComponent implements OnInit {
         nom: '',
         telephone: '',
         adresse: '',
+        lienGps: '',
         notes: ''
     };
 
@@ -580,6 +592,11 @@ export class ShoppingCartComponent implements OnInit {
         this.dialogCommandeVisible = true;
     }
 
+    onAdresseChoisie(info: AdresseInfo): void {
+        this.infosClient.adresse = info.adresse;
+        this.infosClient.lienGps = info.lienGps;
+    }
+
     envoyerCommande() {
         const articles = this.panierService.articles();
         const montantTotal = this.panierService.montantTotal();
@@ -609,11 +626,13 @@ export class ShoppingCartComponent implements OnInit {
                         nomClient: this.infosClient.nom,
                         telephoneClient: this.infosClient.telephone,
                         adresseClient: this.infosClient.adresse,
+                        lienGps: this.infosClient.lienGps,
                         note: this.infosClient.notes,
                         montantTotal,
                         articles: articles.map((a) => ({
                             produitId: a.produit.id,
                             produitNom: a.produit.nom,
+                            imageUrl: this.produitService.resolveImageUrl(a.produit.imageUrl),
                             quantite: a.quantite,
                             options: a.options
                         }))

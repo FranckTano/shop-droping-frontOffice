@@ -2,6 +2,7 @@ package com.shop.droping.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,19 +22,28 @@ public class SecurityConfig {
     private final JwtRequestFilter jwtRequestFilter;
     private final LogoutHandler logoutHandler;
 
-    private static final String[] PUBLIC_URL = {
+    private static final String[] PUBLIC_GET = {
+            "/api/produits",
+            "/api/produits/**",
+            "/api/categories",
+            "/api/categories/**",
+            "/assets/**",
+            "/images/**",
+            "/uploads/**",
+            "/fichiers/**"
+    };
+
+    private static final String[] PUBLIC_ANY = {
             "/ws/securite/auth/**",
+            "/api/commandes",
             "/v2/api-docs",
             "/v3/api-docs",
             "/v3/api-docs/**",
-            "/swagger-resources",
-            "/swagger-resources/**",
-            "/configuration/ui",
-            "/configuration/security",
             "/swagger-ui/**",
+            "/swagger-ui.html",
             "/webjars/**",
-            "/websocket/**",
-            "/swagger-ui.html"};
+            "/websocket/**"
+    };
 
     public SecurityConfig(JwtRequestFilter jwtRequestFilter, LogoutHandler logoutHandler) {
         this.jwtRequestFilter = jwtRequestFilter;
@@ -45,15 +55,27 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(auth ->
-                                auth.requestMatchers("/**").permitAll() // TEMPORAIRE: Permettre l'accès à tous les endpoints
+                .authorizeHttpRequests(auth -> auth
+                        // Endpoints publics (GET)
+                        .requestMatchers(HttpMethod.GET, PUBLIC_GET).permitAll()
+                        // Endpoints publics (toutes méthodes)
+                        .requestMatchers(PUBLIC_ANY).permitAll()
+                        // POST public pour créer une commande
+                        .requestMatchers(HttpMethod.POST, "/api/commandes").permitAll()
+                        // Admin: ADMIN ou SUPER_ADMIN
+                        .requestMatchers("/api/admin/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN")
+                        // Utilisateurs: SUPER_ADMIN uniquement
+                        .requestMatchers("/api/utilisateurs/**").hasAuthority("SUPER_ADMIN")
+                        // Tout le reste nécessite authentification
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class) // TEMPORAIRE: Désactiver le filtre JWT
-                .logout(logout ->
-                        logout.logoutUrl("/ws/auth/logout")
-                                .addLogoutHandler(logoutHandler)
-                                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout(logout -> logout
+                        .logoutUrl("/ws/auth/logout")
+                        .addLogoutHandler(logoutHandler)
+                        .logoutSuccessHandler((request, response, authentication) ->
+                                SecurityContextHolder.clearContext())
                 );
         return http.build();
     }
