@@ -89,12 +89,6 @@ export class AuthService {
 		this.utilisateur.next(this.getUtilisateurConnecte());
 	}
 
-	authentifierUtilisateurOnea(): Observable<Token> {
-		return this.authentifier(
-			new LoginPassword({username: 'onea', password: 'eburtis2020'})
-		);
-	}
-
 	/**
 	 * Retourne true si l'utilisateur a droit à une fonctionnalité
 	 *
