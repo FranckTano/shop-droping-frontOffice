@@ -4,6 +4,11 @@ export default [
     {
         path: '',
         data: { breadcrumb: 'Accueil' },
+        loadComponent: () => import('./storefront/storefront.component').then((c) => c.StorefrontComponent)
+    },
+    {
+        path: 'productlist',
+        data: { breadcrumb: 'Ancienne Boutique' },
         loadComponent: () => import('./productlist').then((c) => c.ProductListComponent)
     },
     {
