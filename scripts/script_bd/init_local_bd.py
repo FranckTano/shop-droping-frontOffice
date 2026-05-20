@@ -3,7 +3,7 @@ import psycopg2
 POSTGRES_USER = "postgres"
 POSTGRES_PASSWORD = "password"
 POSTGRES_HOST = "localhost"
-POSTGRES_PORT = "5432"
+POSTGRES_PORT = "5433"
 TARGET_DB = "shop_dropping"
 TARGET_ROLE = "user"
 
