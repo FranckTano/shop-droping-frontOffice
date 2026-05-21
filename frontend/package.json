@@ -5,6 +5,9 @@
 		"ng": "ng",
 		"start": "npm run prebuild && ng serve --port 4400",
 		"prebuild": "node version.js && node commit.js",
+		"tailwind:build": "npx tailwindcss -i src/styles.css -o src/tailwind.css",
+		"tailwind:watch": "npx tailwindcss -i src/styles.css -o src/tailwind.css --watch",
+		"start:dev": "concurrently \"npm:tailwind:watch\" \"ng serve --hmr --port 4400\"",
 		"build": "ng build --configuration=production",
 		"watch": "ng build --watch --configuration development",
 		"format": "prettier --write \"**/*.{js,mjs,ts,mts,d.ts,html}\" --cache",
@@ -63,6 +66,7 @@
 		"karma-jasmine": "~5.1.0",
 		"karma-jasmine-html-reporter": "~2.1.0",
 		"postcss": "^8.4.49",
+		"concurrently": "^8.2.0",
 		"prettier": "^3.0.0",
 		"tailwindcss": "^3.4.17",
 		"typescript": "~5.6.2"
