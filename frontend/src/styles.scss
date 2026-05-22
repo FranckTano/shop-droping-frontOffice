@@ -4,15 +4,33 @@
 @use 'primeicons/primeicons.css';
 @use './assets/demo/demo.scss';
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
 
+/* ===== DESIGN TOKENS ===== */
 :root {
-	--shop-primary: #d9480f;
+	/* Legacy admin variables (kept for admin panel) */
+	--shop-primary: #FF4500;
 	--shop-accent: #1158a5;
 	--shop-text: #0f172a;
 	--shop-muted: #64748b;
+
+	/* Boutique light theme tokens (MOMO Shop) */
+	--bd-bg: #faf7f2;
+	--bd-surface: #ffffff;
+	--bd-surface-2: #f5f0e6;
+	--bd-border: #ede8e0;
+	--bd-border-2: #ddd8d0;
+	--bd-orange: #FF4500;
+	--bd-orange-hover: #e03d00;
+	--bd-orange-glow: rgba(255, 69, 0, 0.15);
+	--bd-gold: #F5A623;
+	--bd-green: #25D366;
+	--bd-text: #111111;
+	--bd-text-2: #555555;
+	--bd-text-3: #9e9490;
 }
 
+/* ===== GLOBAL BASE ===== */
 body {
 	font-family: 'Poppins', 'Segoe UI', sans-serif;
 	color: var(--shop-text);
@@ -20,8 +38,120 @@ body {
 		radial-gradient(circle at 12% 10%, rgba(245, 158, 11, 0.1), transparent 35%),
 		radial-gradient(circle at 88% 2%, rgba(14, 116, 144, 0.1), transparent 30%),
 		#f8fafc;
+	margin: 0;
+	padding: 0;
+}
+
+/* Boutique pages bg */
+app-boutique-layout {
+	background: var(--bd-bg);
+	display: block;
 }
 
 .p-button {
 	border-radius: 0.7rem;
+}
+
+/* ===== BOUTIQUE PRIMENG DARK OVERRIDES ===== */
+
+/* Toast light (boutique) */
+app-boutique-layout p-toast .p-toast {
+	.p-toast-message {
+		background: #ffffff !important;
+		border: 1px solid #ede8e0 !important;
+		color: #111111 !important;
+		border-radius: 0.75rem !important;
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+	}
+
+	.p-toast-message-text { color: #111111 !important; }
+	.p-toast-summary { color: #111111 !important; font-weight: 600 !important; }
+	.p-toast-detail { color: #666666 !important; }
+	.p-toast-icon-close { color: #999 !important; }
+
+	.p-toast-message-success {
+		border-left: 4px solid #00C851 !important;
+		.p-toast-message-icon { color: #00C851 !important; }
+	}
+
+	.p-toast-message-error {
+		border-left: 4px solid #e53935 !important;
+		.p-toast-message-icon { color: #e53935 !important; }
+	}
+
+	.p-toast-message-warn {
+		border-left: 4px solid #F5A623 !important;
+		.p-toast-message-icon { color: #F5A623 !important; }
+	}
+}
+
+/* Confirm dialog dark */
+.p-confirmdialog {
+	.p-dialog-header,
+	.p-dialog-content,
+	.p-dialog-footer {
+		background: #111111 !important;
+		color: #ffffff !important;
+	}
+
+	.p-dialog-header-icon {
+		color: rgba(255, 255, 255, 0.5) !important;
+	}
+
+	.p-confirm-dialog-message {
+		color: rgba(255, 255, 255, 0.7) !important;
+	}
+}
+
+/* Overlay/backdrop */
+.p-component-overlay {
+	background: rgba(0, 0, 0, 0.75) !important;
+	backdrop-filter: blur(8px) !important;
+}
+
+/* Checkbox light (boutique) */
+app-boutique-layout {
+	.p-checkbox .p-checkbox-box {
+		background: #ffffff !important;
+		border: 1.5px solid #ddd8d0 !important;
+		border-radius: 4px !important;
+	}
+
+	.p-checkbox .p-checkbox-box.p-highlight {
+		background: var(--bd-orange) !important;
+		border-color: var(--bd-orange) !important;
+	}
+}
+
+/* Skeleton light */
+app-boutique-layout {
+	.p-skeleton {
+		background: #ede8e0 !important;
+
+		&::after {
+			background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent) !important;
+		}
+	}
+}
+
+/* ===== SCROLLBAR ===== */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: #ddd8d0 transparent;
+}
+
+*::-webkit-scrollbar { width: 5px; height: 5px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+	background: #ddd8d0;
+	border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+	background: #c8c0b6;
+}
+
+/* ===== SMOOTH SCROLLING ===== */
+html {
+	scroll-behavior: smooth;
 }
