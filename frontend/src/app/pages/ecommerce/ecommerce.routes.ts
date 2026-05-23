@@ -21,6 +21,11 @@ export default [
                 data: { breadcrumb: 'Panier' },
                 loadComponent: () => import('./shoppingcart.component').then((c) => c.ShoppingCartComponent)
             },
+            {
+                path: 'coming-soon',
+                data: { breadcrumb: 'En développement' },
+                loadComponent: () => import('./coming-soon').then((c) => c.ComingSoonComponent)
+            },
         ]
     }
 ] as Routes;

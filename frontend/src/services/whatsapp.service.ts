@@ -1,17 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
-import { environment } from '../../environments/environment';
-import { ArticlePanier } from './panier.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WhatsappService {
-  private readonly numeroVendeur = '+2250799136306'; // Numéro du vendeur
-
-  constructor() {}
+  private readonly numeroVendeur  = '+2250799136306';
+  private readonly backofficeUrl  = 'http://localhost:4400';
 
   creerMessageCommande(commande: any, commandeId: number): string {
     let message = `🛒 *NOUVELLE COMMANDE #${commandeId} - Shop Droping*\n\n`;
@@ -19,7 +13,7 @@ export class WhatsappService {
     message += `📱 *Téléphone:* ${commande.telephoneClient}\n`;
     message += `📍 *Adresse:* ${commande.adresseClient}\n`;
     if (commande.note) {
-        message += `📝 *Notes:* ${commande.note}\n`;
+      message += `📝 *Notes:* ${commande.note}\n`;
     }
     message += `\n━━━━━━━━━━━━━━━━━━━━━\n`;
     message += `📦 *ARTICLES COMMANDÉS:*\n\n`;
@@ -29,7 +23,7 @@ export class WhatsappService {
       message += `   📏 Taille: ${article.options.taille}\n`;
       message += `   🎨 Couleur: ${article.options.couleur}\n`;
       if (article.options.badgesOfficiels) {
-          message += `   ✅ Badges officiels\n`;
+        message += `   ✅ Badges officiels\n`;
       }
       if (article.options.flocage) {
         const detailFlocage = [article.options.flocageNom, article.options.flocageNumero]
@@ -42,18 +36,18 @@ export class WhatsappService {
 
     message += `━━━━━━━━━━━━━━━━━━━━━\n`;
     message += `💵 *TOTAL: ${this.formatPrix(commande.montantTotal)} FCFA*\n\n`;
-    message += `Merci pour votre commande ! 🙏`;
+    message += `Merci pour votre commande ! 🙏\n\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `🔗 *Gérer cette commande (Admin) :*\n`;
+    message += `${this.backofficeUrl}/admin/commandes/${commandeId}`;
 
     return message;
   }
 
-  /**
-   * Ouvre WhatsApp avec le message pré-rempli
-   */
   envoyerMessage(message: string): void {
     const encodedMessage = encodeURIComponent(message);
-    const cleanNumero = this.numeroVendeur.replace(/[^0-9]/g, '');
-    const lienWhatsApp = `https://wa.me/${cleanNumero}?text=${encodedMessage}`;
+    const cleanNumero    = this.numeroVendeur.replace(/[^0-9]/g, '');
+    const lienWhatsApp   = `https://wa.me/${cleanNumero}?text=${encodedMessage}`;
     window.open(lienWhatsApp, '_blank');
   }
 
@@ -61,4 +55,3 @@ export class WhatsappService {
     return new Intl.NumberFormat('fr-FR').format(prix);
   }
 }
-

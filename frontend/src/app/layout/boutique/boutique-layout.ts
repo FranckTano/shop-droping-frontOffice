@@ -151,9 +151,9 @@ import { PanierService } from '@services/panier.service';
             <div class="mn-footer__bottom">
                 <small>© {{ annee }} MOMO Shop — Tous droits réservés.</small>
                 <div class="mn-footer__bottom-links">
-                    <a href="#">Confidentialité</a>
-                    <a href="#">CGV</a>
-                    <a href="#">Contact</a>
+                    <a routerLink="/boutique/coming-soon">Confidentialité</a>
+                    <a routerLink="/boutique/coming-soon">CGV</a>
+                    <a routerLink="/boutique/coming-soon">Contact</a>
                 </div>
             </div>
         </footer>
@@ -586,19 +586,19 @@ import { PanierService } from '@services/panier.service';
         .mn-footer__bottom-links a:hover { color: #1A1A1A; }
 
         /* ===== RESPONSIVE ===== */
+
+        /* Tablette large (≤ 1024px) */
         @media (max-width: 1024px) {
-            .mn-footer__inner { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+            .mn-footer__inner { grid-template-columns: 1fr 1fr; gap: 2rem; }
         }
 
+        /* Tablette (≤ 768px) */
         @media (max-width: 768px) {
             .mn-nav__burger { display: flex; }
 
             .mn-nav__links {
                 position: fixed;
-                top: 68px;
-                left: 0;
-                right: 0;
-                bottom: 0;
+                top: 68px; left: 0; right: 0; bottom: 0;
                 flex-direction: column;
                 justify-content: flex-start;
                 align-items: stretch;
@@ -609,22 +609,33 @@ import { PanierService } from '@services/panier.service';
                 transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 z-index: 1000;
                 overflow-y: auto;
-                border-right: 1px solid rgba(0, 0, 0, 0.06);
+                border-right: 1px solid rgba(0,0,0,0.06);
             }
-
             .mn-nav__links--open { transform: translateX(0); }
             .mn-nav__links li a { font-size: 1rem; padding: 0.8rem 1rem; }
             .mn-nav__mobile-cart { display: list-item; }
             .mn-nav__overlay { display: block; }
 
-            .mn-footer__inner { grid-template-columns: 1fr; gap: 2rem; padding: 2.5rem 1.5rem 1.5rem; }
-            .mn-footer__bottom { flex-direction: column; align-items: flex-start; }
+            .mn-footer__inner { grid-template-columns: 1fr; gap: 1.75rem; padding: 2.5rem 1.5rem 1.5rem; }
+            .mn-footer__bottom { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+            .mn-footer__bottom-links { flex-wrap: wrap; gap: 1rem; }
         }
 
+        /* Mobile (≤ 640px) */
         @media (max-width: 640px) {
             .mn-nav__inner { padding: 0 1rem; }
             .mn-footer__newsletter-form { flex-direction: column; }
             .mn-footer__newsletter-btn { width: 100%; padding: 0.7rem; }
+            .mn-footer__inner { padding: 2rem 1rem 1.25rem; gap: 1.5rem; }
+            .mn-footer__tagline { font-size: 0.8rem; }
+        }
+
+        /* Petit mobile (≤ 480px) */
+        @media (max-width: 480px) {
+            .mn-nav__inner { padding: 0 0.85rem; }
+            .mn-nav__logo-name { font-size: 0.88rem; }
+            .mn-nav__logo-sub { font-size: 0.56rem; }
+            .mn-footer__inner { padding: 1.75rem 0.85rem 1rem; }
         }
     `]
 })

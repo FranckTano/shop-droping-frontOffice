@@ -338,8 +338,8 @@ interface InfosClient {
     styles: [`
         :host {
             display: block;
-            background: #0a0a0a;
-            color: #ffffff;
+            background: #faf7f2;
+            color: #1a1a1a;
             font-family: 'Poppins', 'Segoe UI', sans-serif;
             min-height: 100vh;
         }
@@ -393,14 +393,14 @@ interface InfosClient {
         }
 
         .sc-btn--ghost {
-            background: rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #f5f0e6;
+            color: #555555;
+            border: 1px solid #ddd8d0;
         }
 
         .sc-btn--ghost:hover {
-            background: rgba(255, 255, 255, 0.09);
-            color: #ffffff;
+            background: #ede8e0;
+            color: #1a1a1a;
         }
 
         .sc-btn--danger-ghost {
@@ -419,19 +419,44 @@ interface InfosClient {
         .sc-btn--full { width: 100%; }
         .sc-btn--disabled { opacity: 0.4; cursor: not-allowed; }
 
-        /* ===== PAGE HEADER ===== */
+        /* ===== PAGE HEADER FOOTBALL ===== */
         .sc-page-header {
-            padding: 2rem 0 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0800 35%, #0d1500 65%, #080c0a 100%);
             margin-bottom: 2.5rem;
         }
 
+        .sc-page-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: 0;
+        }
+
+        .sc-page-header::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 60% 100% at 15% 50%, rgba(255, 69, 0, 0.12) 0%, transparent 65%);
+            z-index: 0;
+        }
+
         .sc-page-header__inner {
+            position: relative;
+            z-index: 1;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 1rem;
             flex-wrap: wrap;
+            padding: 3rem 1.5rem 2.5rem;
+            max-width: 1320px;
+            margin: 0 auto;
         }
 
         .sc-page-header__kicker {
@@ -439,7 +464,7 @@ interface InfosClient {
             font-size: 0.65rem;
             font-weight: 700;
             letter-spacing: 0.2em;
-            color: #FF4500;
+            color: #FF6B35;
             margin-bottom: 0.3rem;
         }
 
@@ -448,11 +473,13 @@ interface InfosClient {
             font-weight: 900;
             margin: 0 0 0.2rem;
             letter-spacing: -0.02em;
+            color: #ffffff;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.4);
         }
 
         .sc-page-header__count {
             font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.5);
             margin: 0;
         }
 
@@ -461,10 +488,10 @@ interface InfosClient {
             align-items: center;
             gap: 0.5rem;
             padding: 0.55rem 1.1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 0.5rem;
-            color: rgba(255, 255, 255, 0.55);
+            color: rgba(255, 255, 255, 0.7);
             font-size: 0.8rem;
             cursor: pointer;
             font-family: 'Poppins', sans-serif;
@@ -473,15 +500,17 @@ interface InfosClient {
 
         .sc-back-btn:hover {
             color: #ffffff;
-            border-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.12);
         }
 
         /* ===== EMPTY ===== */
         .sc-empty {
             text-align: center;
             padding: 6rem 2rem;
-            border: 1px dashed rgba(255, 255, 255, 0.08);
+            border: 1.5px dashed #ddd8d0;
             border-radius: 1.5rem;
+            background: #ffffff;
         }
 
         .sc-empty__icon { margin-bottom: 1.5rem; }
@@ -489,12 +518,12 @@ interface InfosClient {
         .sc-empty h2 {
             font-size: 1.5rem;
             font-weight: 700;
-            color: rgba(255, 255, 255, 0.7);
+            color: #333333;
             margin: 0 0 0.75rem;
         }
 
         .sc-empty p {
-            color: rgba(255, 255, 255, 0.35);
+            color: #888888;
             max-width: 44ch;
             margin: 0 auto 2rem;
             font-style: italic;
@@ -510,10 +539,11 @@ interface InfosClient {
 
         /* ===== ITEMS ===== */
         .sc-items {
-            background: #111111;
-            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: #ffffff;
+            border: 1px solid #ede8e0;
             border-radius: 1.2rem;
             overflow: hidden;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.06);
         }
 
         .sc-item {
@@ -524,7 +554,7 @@ interface InfosClient {
         }
 
         .sc-item--bordered {
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            border-top: 1px solid #ede8e0;
         }
 
         .sc-item__img-wrap {
@@ -532,8 +562,8 @@ interface InfosClient {
             height: 130px;
             border-radius: 0.75rem;
             overflow: hidden;
-            background: #1a1a1a;
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: #f5f0e6;
+            border: 1px solid #ede8e0;
             flex-shrink: 0;
         }
 
@@ -562,12 +592,12 @@ interface InfosClient {
             margin: 0 0 0.2rem;
             font-size: 0.95rem;
             font-weight: 700;
-            color: #ffffff;
+            color: #1a1a1a;
         }
 
         .sc-item__cat {
             font-size: 0.72rem;
-            color: rgba(255, 255, 255, 0.35);
+            color: #9e9490;
         }
 
         .sc-item__unit-price {
@@ -587,11 +617,11 @@ interface InfosClient {
 
         .sc-tag {
             padding: 0.2rem 0.55rem;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #f5f0e6;
+            border: 1px solid #ddd8d0;
             border-radius: 999px;
             font-size: 0.68rem;
-            color: rgba(255, 255, 255, 0.55);
+            color: #6b6460;
         }
 
         .sc-tag--special {
@@ -603,7 +633,7 @@ interface InfosClient {
         /* Options editor */
         .sc-options {
             margin-bottom: 0.75rem;
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            border: 1px solid #ede8e0;
             border-radius: 0.6rem;
             overflow: hidden;
         }
@@ -613,16 +643,16 @@ interface InfosClient {
             align-items: center;
             justify-content: space-between;
             padding: 0.55rem 0.75rem;
-            background: rgba(255, 255, 255, 0.03);
+            background: #faf7f2;
             cursor: pointer;
             font-size: 0.78rem;
-            color: rgba(255, 255, 255, 0.45);
+            color: #888;
             transition: background 0.2s ease;
         }
 
         .sc-options__header:hover {
-            background: rgba(255, 255, 255, 0.06);
-            color: rgba(255, 255, 255, 0.7);
+            background: #f5f0e6;
+            color: #555;
         }
 
         .sc-options__header svg {
@@ -652,7 +682,7 @@ interface InfosClient {
         .sc-opt-label {
             display: block;
             font-size: 0.73rem;
-            color: rgba(255, 255, 255, 0.35);
+            color: #9e9490;
             margin-bottom: 0.3rem;
         }
 
@@ -662,13 +692,13 @@ interface InfosClient {
             gap: 0.5rem;
             padding: 0.35rem 0;
             font-size: 0.82rem;
-            color: rgba(255, 255, 255, 0.6);
+            color: #555555;
             cursor: pointer;
         }
 
         .sc-opt-check em {
             font-style: normal;
-            color: rgba(255, 255, 255, 0.35);
+            color: #9e9490;
             font-size: 0.75rem;
         }
 
@@ -682,10 +712,10 @@ interface InfosClient {
         .sc-flocage-input {
             width: 100%;
             padding: 0.45rem 0.65rem;
-            background: rgba(255, 255, 255, 0.04) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            background: #ffffff !important;
+            border: 1px solid #ddd8d0 !important;
             border-radius: 0.4rem !important;
-            color: #ffffff !important;
+            color: #1a1a1a !important;
             font-size: 0.8rem;
             font-family: 'Poppins', sans-serif;
         }
@@ -702,8 +732,8 @@ interface InfosClient {
             display: flex;
             align-items: center;
             gap: 0;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.09);
+            background: #f5f0e6;
+            border: 1px solid #ddd8d0;
             border-radius: 0.5rem;
             overflow: hidden;
         }
@@ -713,7 +743,7 @@ interface InfosClient {
             height: 32px;
             background: transparent;
             border: none;
-            color: rgba(255, 255, 255, 0.55);
+            color: #666666;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -722,8 +752,8 @@ interface InfosClient {
         }
 
         .sc-qty-btn:hover:not(:disabled) {
-            background: rgba(255, 255, 255, 0.08);
-            color: #ffffff;
+            background: #ede8e0;
+            color: #1a1a1a;
         }
 
         .sc-qty-btn:disabled { opacity: 0.3; cursor: default; }
@@ -733,9 +763,9 @@ interface InfosClient {
             text-align: center;
             font-size: 0.9rem;
             font-weight: 700;
-            color: #ffffff;
-            border-left: 1px solid rgba(255, 255, 255, 0.07);
-            border-right: 1px solid rgba(255, 255, 255, 0.07);
+            color: #1a1a1a;
+            border-left: 1px solid #ddd8d0;
+            border-right: 1px solid #ddd8d0;
             line-height: 32px;
         }
 
@@ -748,7 +778,7 @@ interface InfosClient {
         .sc-item__total {
             font-size: 1rem;
             font-weight: 700;
-            color: #ffffff;
+            color: #1a1a1a;
         }
 
         .sc-del-btn {
@@ -773,26 +803,27 @@ interface InfosClient {
 
         .sc-items__footer {
             padding: 1rem 1.2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            border-top: 1px solid #ede8e0;
             display: flex;
             justify-content: flex-end;
         }
 
         /* ===== SUMMARY ===== */
         .sc-summary {
-            background: #111111;
-            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: #ffffff;
+            border: 1px solid #ede8e0;
             border-radius: 1.2rem;
             padding: 1.5rem;
             position: sticky;
             top: calc(72px + 1rem);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
         }
 
         .sc-summary__title {
             font-size: 1.1rem;
             font-weight: 700;
             margin: 0 0 1.2rem;
-            color: #ffffff;
+            color: #1a1a1a;
         }
 
         .sc-summary__lines {
@@ -807,7 +838,7 @@ interface InfosClient {
             justify-content: space-between;
             gap: 0.5rem;
             font-size: 0.78rem;
-            color: rgba(255, 255, 255, 0.35);
+            color: #9e9490;
         }
 
         .sc-summary__item-name {
@@ -819,7 +850,7 @@ interface InfosClient {
 
         .sc-summary__divider {
             height: 1px;
-            background: rgba(255, 255, 255, 0.07);
+            background: #ede8e0;
             margin: 0.75rem 0;
         }
 
@@ -827,12 +858,12 @@ interface InfosClient {
             display: flex;
             justify-content: space-between;
             font-size: 0.87rem;
-            color: rgba(255, 255, 255, 0.55);
+            color: #555555;
             margin-bottom: 0.5rem;
         }
 
         .sc-summary__row--muted {
-            color: rgba(255, 255, 255, 0.3);
+            color: #9e9490;
             font-size: 0.8rem;
         }
 
@@ -846,13 +877,13 @@ interface InfosClient {
         .sc-summary__total span {
             font-size: 1rem;
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.7);
+            color: #555555;
         }
 
         .sc-summary__total strong {
             font-size: 1.5rem;
             font-weight: 800;
-            color: #ffffff;
+            color: #1a1a1a;
         }
 
         .sc-summary__trust {
@@ -867,19 +898,19 @@ interface InfosClient {
             align-items: center;
             gap: 0.5rem;
             font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.35);
+            color: #9e9490;
         }
 
         /* ===== DIALOG ===== */
         ::ng-deep .sc-order-dialog .p-dialog {
-            background: #111111 !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            background: #ffffff !important;
+            border: 1px solid #ede8e0 !important;
             border-radius: 1.2rem !important;
         }
 
         ::ng-deep .sc-order-dialog .p-dialog-header {
             background: transparent !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+            border-bottom: 1px solid #ede8e0 !important;
             padding: 1.2rem 1.5rem !important;
         }
 
@@ -890,7 +921,7 @@ interface InfosClient {
 
         ::ng-deep .sc-order-dialog .p-dialog-footer {
             background: transparent !important;
-            border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
+            border-top: 1px solid #ede8e0 !important;
             padding: 1rem 1.5rem !important;
         }
 
@@ -915,13 +946,13 @@ interface InfosClient {
         .sc-dialog__title {
             font-size: 1.05rem;
             font-weight: 700;
-            color: #ffffff;
+            color: #1a1a1a;
             margin: 0 0 0.15rem;
         }
 
         .sc-dialog__subtitle {
             font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.4);
+            color: #9e9490;
             margin: 0;
         }
 
@@ -943,16 +974,16 @@ interface InfosClient {
             gap: 0.4rem;
             font-size: 0.8rem;
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.5);
+            color: #555555;
             letter-spacing: 0.04em;
         }
 
         .sc-input {
             padding: 0.7rem 0.9rem !important;
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            background: #ffffff !important;
+            border: 1px solid #ddd8d0 !important;
             border-radius: 0.6rem !important;
-            color: #ffffff !important;
+            color: #1a1a1a !important;
             font-family: 'Poppins', sans-serif !important;
             font-size: 0.88rem !important;
             transition: border-color 0.2s ease;
@@ -960,39 +991,39 @@ interface InfosClient {
         }
 
         ::ng-deep .sc-input.p-inputtext {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            color: #ffffff !important;
+            background: #ffffff !important;
+            border: 1px solid #ddd8d0 !important;
+            color: #1a1a1a !important;
             border-radius: 0.6rem !important;
         }
 
         ::ng-deep .sc-input.p-inputtext:focus {
-            border-color: rgba(255, 69, 0, 0.4) !important;
+            border-color: rgba(255, 69, 0, 0.5) !important;
             box-shadow: none !important;
         }
 
-        ::ng-deep .sc-input.p-inputtext::placeholder { color: rgba(255, 255, 255, 0.25) !important; }
+        ::ng-deep .sc-input.p-inputtext::placeholder { color: #bbb5ad !important; }
 
         .sc-textarea {
             width: 100%;
             padding: 0.7rem 0.9rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #ffffff;
+            border: 1px solid #ddd8d0;
             border-radius: 0.6rem;
-            color: #ffffff;
+            color: #1a1a1a;
             font-family: 'Poppins', sans-serif;
             font-size: 0.88rem;
             resize: vertical;
             outline: none;
         }
 
-        .sc-textarea:focus { border-color: rgba(255, 69, 0, 0.4); }
-        .sc-textarea::placeholder { color: rgba(255, 255, 255, 0.25); }
+        .sc-textarea:focus { border-color: rgba(255, 69, 0, 0.5); }
+        .sc-textarea::placeholder { color: #bbb5ad; }
 
         /* Order preview */
         .sc-order-preview {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: #faf7f2;
+            border: 1px solid #ede8e0;
             border-radius: 0.75rem;
             padding: 1rem;
         }
@@ -1002,7 +1033,7 @@ interface InfosClient {
             font-weight: 700;
             letter-spacing: 0.12em;
             text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.35);
+            color: #9e9490;
             margin-bottom: 0.75rem;
         }
 
@@ -1010,9 +1041,9 @@ interface InfosClient {
             display: flex;
             justify-content: space-between;
             font-size: 0.82rem;
-            color: rgba(255, 255, 255, 0.5);
+            color: #555555;
             padding: 0.25rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid #ede8e0;
         }
 
         .sc-order-preview__total {
@@ -1023,7 +1054,7 @@ interface InfosClient {
             margin-top: 0.25rem;
         }
 
-        .sc-order-preview__total span { color: rgba(255, 255, 255, 0.6); }
+        .sc-order-preview__total span { color: #555555; }
         .sc-order-preview__total strong { color: #FF4500; font-weight: 700; }
 
         .sc-dialog__footer {
@@ -1034,60 +1065,68 @@ interface InfosClient {
 
         /* ===== CONFIRM DIALOG ===== */
         ::ng-deep .sc-confirm-dialog .p-confirmdialog {
-            background: #111111 !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            background: #ffffff !important;
+            border: 1px solid #ede8e0 !important;
             border-radius: 1rem !important;
         }
 
         ::ng-deep .p-confirmdialog .p-dialog-header,
         ::ng-deep .p-confirmdialog .p-dialog-content,
         ::ng-deep .p-confirmdialog .p-dialog-footer {
-            background: #111111 !important;
-            color: #ffffff !important;
+            background: #ffffff !important;
+            color: #1a1a1a !important;
         }
 
-        /* Multiselect dark overrides */
+        /* Multiselect light overrides */
         ::ng-deep .sc-multiselect.p-multiselect {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            background: #ffffff !important;
+            border: 1px solid #ddd8d0 !important;
             border-radius: 0.5rem !important;
         }
 
         ::ng-deep .sc-multiselect .p-multiselect-label {
-            color: rgba(255, 255, 255, 0.6) !important;
+            color: #555555 !important;
             font-size: 0.82rem;
         }
 
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 1024px) {
-            .sc-layout {
-                grid-template-columns: 1fr;
-            }
 
-            .sc-summary {
-                position: static;
-            }
+        /* Tablette large (≤ 1024px) */
+        @media (max-width: 1024px) {
+            .sc-layout { grid-template-columns: 1fr; }
+            .sc-summary { position: static; }
+            .sc-page-header__inner { padding: 2.5rem 1.5rem 2rem; }
         }
 
-        @media (max-width: 640px) {
+        /* Tablette (≤ 768px) */
+        @media (max-width: 768px) {
             .sc-item {
-                grid-template-columns: 1fr;
+                grid-template-columns: 90px 1fr;
+                gap: 0.75rem;
             }
+            .sc-item__img-wrap { width: 90px; height: 110px; }
+            .sc-item__name { font-size: 0.88rem; }
+            .sc-page-header__inner { padding: 2rem 1.2rem 1.5rem; flex-direction: column; align-items: flex-start; }
+            .sc-back-btn { align-self: flex-start; }
+        }
 
-            .sc-item__img-wrap {
-                width: 100%;
-                height: 200px;
-            }
-
-            .sc-dialog__footer {
-                flex-direction: column;
-            }
-
+        /* Mobile (≤ 640px) */
+        @media (max-width: 640px) {
+            .sc-item { grid-template-columns: 1fr; }
+            .sc-item__img-wrap { width: 100%; height: 220px; }
+            .sc-dialog__footer { flex-direction: column; }
             .sc-dialog__footer .sc-btn { width: 100%; }
+            .sc-flocage-inputs { grid-template-columns: 1fr; }
+            .sc-page-header__inner { padding: 1.5rem 1rem 1.2rem; }
+        }
 
-            .sc-flocage-inputs {
-                grid-template-columns: 1fr;
-            }
+        /* Petit mobile (≤ 480px) */
+        @media (max-width: 480px) {
+            .sc-shell { padding-bottom: 2rem; }
+            .sc-items { padding: 0.75rem; }
+            .sc-summary { padding: 1.2rem; }
+            .sc-total-row { font-size: 0.9rem; }
+            .sc-total-row strong { font-size: 1.3rem; }
         }
     `]
 })
