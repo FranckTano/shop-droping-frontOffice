@@ -35,5 +35,7 @@ public interface CommandeRepository extends JpaRepository<Commande, Long> {
     Long countByStatut(@Param("statut") StatutCommande statut);
 
     List<Commande> findByClientTelephoneOrderByCreateAtDesc(String telephone);
+
+    Optional<Commande> findByTransactionId(String transactionId);
 }
 

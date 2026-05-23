@@ -258,6 +258,10 @@ type VueMode = 'grid-classic' | 'grid-premium' | 'masonry' | 'list' | 'mini' | '
                                 <h3 class="pl-card__name">{{ produit.nom }}</h3>
                                 <span class="pl-card__team">{{ produit.equipe }}</span>
                             </div>
+                            <div class="pl-card__sur-commande">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                Sur commande · 2–5 j
+                            </div>
                             <div class="pl-card__footer">
                                 <div class="pl-card__price">
                                     <small>Prix TTC</small>
@@ -347,6 +351,10 @@ type VueMode = 'grid-classic' | 'grid-premium' | 'masonry' | 'list' | 'mini' | '
                             <div>
                                 <h3 class="pl-card__name">{{ produit.nom }}</h3>
                                 <span class="pl-card__team">{{ produit.equipe }}</span>
+                            </div>
+                            <div class="pl-card__sur-commande">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                Sur commande · 2–5 j
                             </div>
                             <div class="pl-card__footer">
                                 <div class="pl-card__price">
@@ -938,6 +946,12 @@ type VueMode = 'grid-classic' | 'grid-premium' | 'masonry' | 'list' | 'mini' | '
         }
         .pl-card__name { margin: 0; font-size: 0.88rem; font-weight: 600; color: #111111; line-height: 1.3; }
         .pl-card__team { font-size: 0.72rem; color: #9e9490; }
+        .pl-card__sur-commande {
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            font-size: 0.68rem; font-weight: 600; color: #FF6B35;
+            background: rgba(255, 107, 53, 0.1); border: 1px solid rgba(255,107,53,0.25);
+            border-radius: 999px; padding: 0.18rem 0.55rem; width: fit-content;
+        }
         .pl-card__footer { display: flex; align-items: center; justify-content: space-between; }
         .pl-card__price small { display: block; font-size: 0.62rem; color: #bbb5ad; letter-spacing: 0.04em; }
         .pl-card__price strong { font-size: 1rem; font-weight: 700; color: #FF4500; }

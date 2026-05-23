@@ -5,10 +5,12 @@ import { Injectable } from '@angular/core';
 })
 export class WhatsappService {
   private readonly numeroVendeur  = '+2250799136306';
-  private readonly backofficeUrl  = 'http://localhost:4400';
+  private readonly backofficeUrl   = 'http://localhost:4400';
+  private readonly frontofficeUrl  = 'http://localhost:3000';
 
-  creerMessageCommande(commande: any, commandeId: number): string {
-    let message = `🛒 *NOUVELLE COMMANDE #${commandeId} - Shop Droping*\n\n`;
+  creerMessageCommande(commande: any, commandeId: number, commandeNumero?: string): string {
+    const ref = commandeNumero ? `N° ${commandeNumero}` : `#${commandeId}`;
+    let message = `🛒 *NOUVELLE COMMANDE ${ref} - Shop Droping*\n\n`;
     message += `👤 *Client:* ${commande.nomClient}\n`;
     message += `📱 *Téléphone:* ${commande.telephoneClient}\n`;
     message += `📍 *Adresse:* ${commande.adresseClient}\n`;
@@ -36,10 +38,46 @@ export class WhatsappService {
 
     message += `━━━━━━━━━━━━━━━━━━━━━\n`;
     message += `💵 *TOTAL: ${this.formatPrix(commande.montantTotal)} FCFA*\n\n`;
+    message += `⏱️ *Délai de livraison : 2–5 jours ouvrés* après confirmation\n`;
+    message += `📦 Produits sur commande — préparation sous 24h\n\n`;
     message += `Merci pour votre commande ! 🙏\n\n`;
     message += `━━━━━━━━━━━━━━━━━━━━━\n`;
     message += `🔗 *Gérer cette commande (Admin) :*\n`;
-    message += `${this.backofficeUrl}/admin/commandes/${commandeId}`;
+    message += `${this.backofficeUrl}/admin/commandes/${commandeId}\n\n`;
+    if (commandeNumero) {
+      message += `📲 *Lien de suivi pour le client :*\n`;
+      message += `${this.frontofficeUrl}/boutique/ma-commande?numero=${commandeNumero}`;
+    }
+
+    return message;
+  }
+
+  creerMessageMobileMoney(commande: any, commandeId: number, commandeNumero?: string): string {
+    const ref = commandeNumero ? `N° ${commandeNumero}` : `#${commandeId}`;
+    let message = `💳 *PAIEMENT MOBILE MONEY - MOMO Shop*\n`;
+    message += `Commande ${ref}\n\n`;
+    message += `👤 *Client:* ${commande.nomClient}\n`;
+    message += `📱 *Téléphone:* ${commande.telephoneClient}\n`;
+    message += `📍 *Adresse:* ${commande.adresseClient}\n\n`;
+
+    message += `━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `📦 *Articles:*\n`;
+    commande.articles.forEach((article: any, index: number) => {
+      message += `${index + 1}. ${article.produitNom || ('Produit #' + article.produitId)}`;
+      message += ` — Taille: ${article.options.taille}, Qté: ${article.quantite}\n`;
+    });
+
+    message += `\n━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `💵 *MONTANT À PAYER : ${this.formatPrix(commande.montantTotal)} FCFA*\n\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `📲 *INSTRUCTIONS DE PAIEMENT :*\n\n`;
+    message += `Envoyez *${this.formatPrix(commande.montantTotal)} FCFA* au numéro :\n`;
+    message += `➡️ *${this.numeroVendeur}*\n\n`;
+    message += `✅ Via *Wave*, *Orange Money* ou *MTN MoMo*\n\n`;
+    message += `Après le transfert, envoyez ici :\n`;
+    message += `• La *capture d'écran* de votre reçu\n`;
+    message += `• Votre *numéro de commande* : ${ref}\n\n`;
+    message += `Votre commande sera traitée dès réception du paiement. 🙏`;
 
     return message;
   }

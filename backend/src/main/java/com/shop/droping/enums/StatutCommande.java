@@ -2,6 +2,9 @@ package com.shop.droping.enums;
 
 public enum StatutCommande {
     EN_ATTENTE("En attente"),
+    CONFIRMEE("Confirmée"),
+    EN_COURS("En cours"),
+    EXPEDIEE("Expédiée"),
     VALIDEE("Validée"),
     LIVREE("Livrée"),
     ANNULEE("Annulée"),

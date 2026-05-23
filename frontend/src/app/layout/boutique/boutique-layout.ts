@@ -1,8 +1,9 @@
-import { Component, inject, HostListener, signal } from '@angular/core';
+import { Component, inject, HostListener, signal, OnInit } from '@angular/core';
 import { RouterModule, Router, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PanierService } from '@services/panier.service';
+import { AnalyticsService } from '@services/analytics.service';
 
 @Component({
     selector: 'app-boutique-layout',
@@ -33,6 +34,11 @@ import { PanierService } from '@services/panier.service';
                     <li><a (click)="naviguer('collection')">Collections</a></li>
                     <li><a (click)="naviguer('actuel')">Nouveautés</a></li>
                     <li><a (click)="naviguer('vintage-court')">Vintage</a></li>
+                    <li>
+                        <a routerLink="/boutique/ma-commande"
+                           routerLinkActive="mn-nav__link--active"
+                           (click)="closeMenu()">Suivi commande</a>
+                    </li>
                     <li class="mn-nav__mobile-cart">
                         <a (click)="allerAuPanier()">
                             Panier
@@ -639,15 +645,20 @@ import { PanierService } from '@services/panier.service';
         }
     `]
 })
-export class BoutiqueLayout {
+export class BoutiqueLayout implements OnInit {
     panierService = inject(PanierService);
     private router = inject(Router);
+    private analytics = inject(AnalyticsService);
 
     scrolled = signal(false);
     menuOpen = signal(false);
     annee = new Date().getFullYear();
     emailNewsletter = '';
     newsletterMessage = '';
+
+    ngOnInit(): void {
+        this.analytics.init();
+    }
 
     @HostListener('window:scroll')
     onScroll(): void {

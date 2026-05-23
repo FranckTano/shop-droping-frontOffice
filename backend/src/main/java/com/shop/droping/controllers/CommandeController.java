@@ -40,4 +40,10 @@ public class CommandeController {
     public WhatsAppLinkDto getLienWhatsApp(@PathVariable Long id) {
         return commandeFacade.genererLienWhatsApp(id);
     }
+
+    // Endpoint public — suivi de commande par numéro (ex: CMD-20260523-ABCDEF)
+    @GetMapping("/suivi/{numero}")
+    public CommandeDto getSuiviCommande(@PathVariable String numero) {
+        return commandeFacade.trouverParNumero(numero);
+    }
 }

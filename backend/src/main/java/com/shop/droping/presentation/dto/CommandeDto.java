@@ -3,6 +3,7 @@ package com.shop.droping.presentation.dto;
 import com.shop.droping.domain.Commande;
 import com.shop.droping.domain.LigneCommande;
 import com.shop.droping.enums.StatutCommande;
+import com.shop.droping.enums.StatutPaiement;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,7 +21,9 @@ public record CommandeDto(
     String notes,
     Boolean whatsappMessageSent,
     LocalDateTime dateCreation,
-    List<LigneCommandeDto> lignes
+    List<LigneCommandeDto> lignes,
+    String transactionId,
+    StatutPaiement statutPaiement
 ) {
     public record LigneCommandeDto(
         Long id,
@@ -72,7 +75,9 @@ public record CommandeDto(
             commande.getWhatsappMessageSent(),
             commande.getCreateAt(),
             commande.getLignes() != null ?
-                commande.getLignes().stream().map(LigneCommandeDto::fromEntity).toList() : List.of()
+                commande.getLignes().stream().map(LigneCommandeDto::fromEntity).toList() : List.of(),
+            commande.getTransactionId(),
+            commande.getStatutPaiement()
         );
     }
 }

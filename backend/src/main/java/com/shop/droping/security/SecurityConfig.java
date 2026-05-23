@@ -27,15 +27,24 @@ public class SecurityConfig {
             "/api/produits/**",
             "/api/categories",
             "/api/categories/**",
+            "/api/commandes/suivi/**",
             "/assets/**",
             "/images/**",
             "/uploads/**",
-            "/fichiers/**"
+            "/fichiers/**",
+            // Routes SPA Angular (PathLocationStrategy)
+            "/",
+            "/boutique",
+            "/boutique/**",
+            "/connexion",
+            "/connexion/**",
+            "/index.html"
     };
 
     private static final String[] PUBLIC_ANY = {
             "/ws/securite/auth/**",
             "/api/commandes",
+            "/api/paiement/webhook",
             "/v2/api-docs",
             "/v3/api-docs",
             "/v3/api-docs/**",
@@ -60,8 +69,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, PUBLIC_GET).permitAll()
                         // Endpoints publics (toutes méthodes)
                         .requestMatchers(PUBLIC_ANY).permitAll()
-                        // POST public pour créer une commande
+                        // POST public pour créer une commande et initier un paiement
                         .requestMatchers(HttpMethod.POST, "/api/commandes").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/paiement/initier/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/paiement/statut/**").permitAll()
                         // Admin: ADMIN ou SUPER_ADMIN
                         .requestMatchers("/api/admin/**").hasAnyAuthority("ADMIN", "SUPER_ADMIN")
                         // Utilisateurs: SUPER_ADMIN uniquement

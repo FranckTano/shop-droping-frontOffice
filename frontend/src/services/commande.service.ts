@@ -17,4 +17,8 @@ export class CommandeService {
   getLienWhatsApp(commandeId: number): Observable<{ numero: string; message: string; lienWhatsApp: string }> {
     return this.http.get<{ numero: string; message: string; lienWhatsApp: string }>(`${this.apiUrl}/${commandeId}/lien-whatsapp`);
   }
+
+  suivreCommande(numero: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/suivi/${encodeURIComponent(numero)}`);
+  }
 }

@@ -8,7 +8,7 @@ import Material from '@primeng/themes/material';
 import {definePreset} from '@primeng/themes';
 import {JWT_OPTIONS, JwtHelperService, JwtInterceptor} from "@auth0/angular-jwt";
 import {apiInterceptor} from "./interceptors/api.interceptor";
-import {HashLocationStrategy, LocationStrategy} from "@angular/common";
+import {PathLocationStrategy, LocationStrategy} from "@angular/common";
 
 const MyPreset = definePreset(Material, {
 	semantic: {
@@ -51,7 +51,7 @@ export const appConfig: ApplicationConfig = {
 			inputStyle: 'filled',
 			theme: {preset: MyPreset, options: {darkModeSelector: '.app-dark'}}
 		}),
-		{ provide: LocationStrategy, useClass: HashLocationStrategy },
+		{ provide: LocationStrategy, useClass: PathLocationStrategy },
 		{ provide: JWT_OPTIONS, useValue: JWT_OPTIONS }
 	]
 };

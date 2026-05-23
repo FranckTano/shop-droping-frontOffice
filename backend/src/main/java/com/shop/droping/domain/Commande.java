@@ -1,6 +1,7 @@
 package com.shop.droping.domain;
 
 import com.shop.droping.enums.StatutCommande;
+import com.shop.droping.enums.StatutPaiement;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -46,6 +47,13 @@ public class Commande extends AbstractEntity {
 
     @Column(name = "whatsapp_message_sent")
     private Boolean whatsappMessageSent = false;
+
+    @Column(name = "transaction_id", length = 100)
+    private String transactionId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "statut_paiement", length = 30)
+    private StatutPaiement statutPaiement = StatutPaiement.NON_PAYE;
 
     @OneToMany(mappedBy = "commande", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LigneCommande> lignes = new ArrayList<>();
@@ -99,6 +107,12 @@ public class Commande extends AbstractEntity {
 
     public Boolean getWhatsappMessageSent() { return whatsappMessageSent; }
     public void setWhatsappMessageSent(Boolean whatsappMessageSent) { this.whatsappMessageSent = whatsappMessageSent; }
+
+    public String getTransactionId() { return transactionId; }
+    public void setTransactionId(String transactionId) { this.transactionId = transactionId; }
+
+    public StatutPaiement getStatutPaiement() { return statutPaiement; }
+    public void setStatutPaiement(StatutPaiement statutPaiement) { this.statutPaiement = statutPaiement; }
 
     public List<LigneCommande> getLignes() { return lignes; }
     public void setLignes(List<LigneCommande> lignes) { this.lignes = lignes; }

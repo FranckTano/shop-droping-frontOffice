@@ -324,13 +324,23 @@ interface InfosClient {
             <ng-template pTemplate="footer">
                 <div class="sc-dialog__footer">
                     <button class="sc-btn sc-btn--ghost" (click)="dialogCommandeVisible = false">Annuler</button>
-                    <button class="sc-btn sc-btn--whatsapp sc-btn--lg"
-                            [disabled]="!infosClient.nom || !infosClient.telephone || !infosClient.adresse"
-                            [class.sc-btn--disabled]="!infosClient.nom || !infosClient.telephone || !infosClient.adresse"
-                            (click)="envoyerCommande()">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
-                        Envoyer sur WhatsApp
-                    </button>
+                    @if (modePaiement === 'mobilemoney') {
+                        <button class="sc-btn sc-btn--mobilemoney sc-btn--lg"
+                                [disabled]="!infosClient.nom || !infosClient.telephone || !infosClient.adresse"
+                                [class.sc-btn--disabled]="!infosClient.nom || !infosClient.telephone || !infosClient.adresse"
+                                (click)="envoyerCommande()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                            Confirmer &amp; Voir instructions de paiement
+                        </button>
+                    } @else {
+                        <button class="sc-btn sc-btn--whatsapp sc-btn--lg"
+                                [disabled]="!infosClient.nom || !infosClient.telephone || !infosClient.adresse"
+                                [class.sc-btn--disabled]="!infosClient.nom || !infosClient.telephone || !infosClient.adresse"
+                                (click)="envoyerCommande()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+                            Envoyer sur WhatsApp
+                        </button>
+                    }
                 </div>
             </ng-template>
         </p-dialog>
@@ -385,6 +395,32 @@ interface InfosClient {
             background: rgba(37, 211, 102, 0.12);
             color: #25D366;
             border: 1px solid rgba(37, 211, 102, 0.3);
+        }
+
+        .sc-btn--mobilemoney {
+            background: linear-gradient(135deg, #1565C0 0%, #1976D2 100%);
+            color: #fff;
+            border: none;
+            font-weight: 700;
+        }
+
+        .sc-btn--mobilemoney:hover:not(:disabled) {
+            background: linear-gradient(135deg, #0d47a1 0%, #1565C0 100%);
+            transform: translateY(-2px);
+        }
+
+        .sc-btn--mobilemoney:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .sc-spinner { animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .sc-ou-separator {
+            display: flex; align-items: center; gap: 0.75rem;
+            color: #aaa; font-size: 0.78rem;
+            margin: 0.15rem 0;
+        }
+        .sc-ou-separator::before, .sc-ou-separator::after {
+            content: ''; flex: 1; height: 1px; background: #ede8e0;
         }
 
         .sc-btn--whatsapp:hover:not(.sc-btn--disabled) {
@@ -1142,6 +1178,8 @@ export class ShoppingCartComponent implements OnInit {
     private confirmationService = inject(ConfirmationService);
     private messageService = inject(MessageService);
 
+    modePaiement: 'whatsapp' | 'mobilemoney' = 'whatsapp';
+
     dialogCommandeVisible = false;
     optionsOuverts = new Set<string>();
 
@@ -1200,9 +1238,11 @@ export class ShoppingCartComponent implements OnInit {
         });
     }
 
-    ouvrirDialogCommande(): void {
+    ouvrirDialogCommande(mode: 'whatsapp' | 'mobilemoney' = 'whatsapp'): void {
+        this.modePaiement = mode;
         this.dialogCommandeVisible = true;
     }
+
 
     onAdresseChoisie(info: AdresseInfo): void {
         this.infosClient.adresse = info.adresse;
@@ -1233,34 +1273,70 @@ export class ShoppingCartComponent implements OnInit {
 
         this.commandeService.creerCommande(commande).subscribe({
             next: (res) => {
-                const message = this.whatsappService.creerMessageCommande(
-                    {
-                        nomClient: this.infosClient.nom,
-                        telephoneClient: this.infosClient.telephone,
-                        adresseClient: this.infosClient.adresse,
-                        lienGps: this.infosClient.lienGps,
-                        note: this.infosClient.notes,
-                        montantTotal,
-                        articles: articles.map((a) => ({
-                            produitId: a.produit.id,
-                            produitNom: a.produit.nom,
-                            imageUrl: this.produitService.resolveImageUrl(a.produit.imageUrl),
-                            quantite: a.quantite,
-                            options: a.options
-                        }))
-                    },
-                    res.id
-                );
-                this.whatsappService.envoyerMessage(message);
-
                 this.dialogCommandeVisible = false;
                 this.panierService.viderPanier();
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Commande envoyée',
-                    detail: 'Redirection vers WhatsApp pour finaliser.',
-                    life: 5000
-                });
+
+                if (this.modePaiement === 'mobilemoney') {
+                    // Mode Mobile Money : envoyer message WhatsApp avec instructions de paiement
+                    const message = this.whatsappService.creerMessageMobileMoney(
+                        {
+                            nomClient: this.infosClient.nom,
+                            telephoneClient: this.infosClient.telephone,
+                            adresseClient: this.infosClient.adresse,
+                            note: this.infosClient.notes,
+                            montantTotal,
+                            articles: articles.map((a) => ({
+                                produitId: a.produit.id,
+                                produitNom: a.produit.nom,
+                                quantite: a.quantite,
+                                options: a.options
+                            }))
+                        },
+                        res.id,
+                        res.numero
+                    );
+                    this.whatsappService.envoyerMessage(message);
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Commande créée ✓',
+                        detail: `N° ${res.numero} — Instructions de paiement envoyées sur WhatsApp.`,
+                        life: 7000
+                    });
+                    setTimeout(() => {
+                        this.router.navigate(['/boutique/ma-commande'], { queryParams: { numero: res.numero } });
+                    }, 1500);
+                } else {
+                    // Mode WhatsApp
+                    const message = this.whatsappService.creerMessageCommande(
+                        {
+                            nomClient: this.infosClient.nom,
+                            telephoneClient: this.infosClient.telephone,
+                            adresseClient: this.infosClient.adresse,
+                            lienGps: this.infosClient.lienGps,
+                            note: this.infosClient.notes,
+                            montantTotal,
+                            articles: articles.map((a) => ({
+                                produitId: a.produit.id,
+                                produitNom: a.produit.nom,
+                                imageUrl: this.produitService.resolveImageUrl(a.produit.imageUrl),
+                                quantite: a.quantite,
+                                options: a.options
+                            }))
+                        },
+                        res.id,
+                        res.numero
+                    );
+                    this.whatsappService.envoyerMessage(message);
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Commande envoyée ✓',
+                        detail: `N° ${res.numero} — Gardez ce numéro pour suivre votre commande.`,
+                        life: 7000
+                    });
+                    setTimeout(() => {
+                        this.router.navigate(['/boutique/ma-commande'], { queryParams: { numero: res.numero } });
+                    }, 1500);
+                }
             },
             error: () => {
                 this.messageService.add({

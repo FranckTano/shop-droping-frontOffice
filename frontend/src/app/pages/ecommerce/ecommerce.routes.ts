@@ -26,6 +26,16 @@ export default [
                 data: { breadcrumb: 'En développement' },
                 loadComponent: () => import('./coming-soon').then((c) => c.ComingSoonComponent)
             },
+            {
+                path: 'ma-commande',
+                data: { breadcrumb: 'Suivi de commande' },
+                loadComponent: () => import('./suivi-commande').then((c) => c.SuiviCommandeComponent)
+            },
+            {
+                path: 'paiement-retour',
+                data: { breadcrumb: 'Confirmation paiement' },
+                loadComponent: () => import('./paiement-retour').then((c) => c.PaiementRetourComponent)
+            },
         ]
     }
 ] as Routes;

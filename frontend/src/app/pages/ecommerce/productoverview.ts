@@ -12,6 +12,7 @@ import { MessageService } from 'primeng/api';
 import { ProduitService, Produit } from '@services/produit.service';
 import { PanierService, OptionsMaillot } from '@services/panier.service';
 import { SkeletonModule } from 'primeng/skeleton';
+import { AnalyticsService } from '@services/analytics.service';
 
 @Component({
     selector: 'app-product-overview',
@@ -103,6 +104,18 @@ import { SkeletonModule } from 'primeng/skeleton';
                         <div class="po-info__price">
                             <strong>{{ formatPrix(produit.prix) }}</strong>
                             <span>FCFA</span>
+                        </div>
+
+                        <!-- Badge Sur commande + délai -->
+                        <div class="po-sur-commande">
+                            <div class="po-sur-commande__badge">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                Sur commande
+                            </div>
+                            <div class="po-sur-commande__delai">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                                Livraison 2–5 jours ouvrés
+                            </div>
                         </div>
 
                         <p class="po-info__desc">{{ produit.description || 'Maillot officiel de haute qualité avec finitions premium.' }}</p>
@@ -249,9 +262,29 @@ import { SkeletonModule } from 'primeng/skeleton';
                                 <p *ngIf="tabActif === 'desc'">
                                     {{ produit.description || 'Maillot officiel de haute qualité avec finitions premium.' }}
                                 </p>
-                                <p *ngIf="tabActif === 'livraison'">
-                                    Livraison à domicile ou en point relais. Les frais exacts sont confirmés lors de la validation via WhatsApp. Préparation sous 24h après confirmation de commande.
-                                </p>
+                                <div *ngIf="tabActif === 'livraison'" class="po-livraison-info">
+                                    <div class="po-livraison-item">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                        <div>
+                                            <strong>Produit sur commande</strong>
+                                            <p>Ce maillot est commandé auprès du fournisseur après validation de votre commande. Délai de préparation : 24h.</p>
+                                        </div>
+                                    </div>
+                                    <div class="po-livraison-item">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                                        <div>
+                                            <strong>Livraison 2–5 jours ouvrés</strong>
+                                            <p>Livraison à domicile ou en point relais à Abidjan. Les frais sont confirmés via WhatsApp.</p>
+                                        </div>
+                                    </div>
+                                    <div class="po-livraison-item">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+                                        <div>
+                                            <strong>Suivi via WhatsApp</strong>
+                                            <p>Vous êtes informé(e) à chaque étape : confirmation, expédition, livraison.</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -470,6 +503,75 @@ import { SkeletonModule } from 'primeng/skeleton';
         .po-info__price span {
             font-size: 1rem;
             color: rgba(255, 255, 255, 0.45);
+        }
+
+        /* Sur commande badge */
+        .po-sur-commande {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin: 0.6rem 0 1.2rem;
+        }
+
+        .po-sur-commande__badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: rgba(255, 107, 53, 0.15);
+            color: #FF6B35;
+            border: 1px solid rgba(255, 107, 53, 0.35);
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.3rem 0.75rem;
+            white-space: nowrap;
+        }
+
+        .po-sur-commande__delai {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.3rem 0.75rem;
+            white-space: nowrap;
+        }
+
+        /* Infos livraison tab */
+        .po-livraison-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .po-livraison-item {
+            display: flex;
+            gap: 0.85rem;
+            align-items: flex-start;
+        }
+
+        .po-livraison-item svg {
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .po-livraison-item strong {
+            display: block;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 0.2rem;
+        }
+
+        .po-livraison-item p {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+            margin: 0;
+            line-height: 1.5;
         }
 
         .po-info__desc {
@@ -914,6 +1016,7 @@ export class ProductOverviewComponent implements OnInit {
     public produitService = inject(ProduitService);
     private panierService = inject(PanierService);
     private messageService = inject(MessageService);
+    private analytics = inject(AnalyticsService);
 
     produit: Produit | null = null;
     chargement = true;
@@ -949,6 +1052,7 @@ export class ProductOverviewComponent implements OnInit {
                 this.tailleSelectionnee = this.taillesDisponibles[0];
                 this.couleurSelectionnee = this.couleursDisponibles[0];
                 this.chargement = false;
+                this.analytics.trackViewItem({ id: data.id, nom: data.nom, prix: data.prix });
             },
             error: () => {
                 this.messageService.add({
