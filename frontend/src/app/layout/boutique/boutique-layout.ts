@@ -601,6 +601,8 @@ import { AnalyticsService } from '@services/analytics.service';
         /* Tablette (≤ 768px) */
         @media (max-width: 768px) {
             .mn-nav__burger { display: flex; }
+            /* Sur mobile les liens sont position:fixed (hors flux) — space-between assure logo à gauche, boutons à droite */
+            .mn-nav__inner { justify-content: space-between; }
 
             .mn-nav__links {
                 position: fixed;
