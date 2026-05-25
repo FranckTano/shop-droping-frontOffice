@@ -1,4 +1,6 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ProduitService, Produit } from '@services/produit.service';
 import { CommonModule } from '@angular/common';
@@ -168,15 +170,16 @@ type VueMode = 'grid-classic' | 'grid-premium' | 'masonry' | 'list' | 'mini' | '
 
                 <div class="pl-toolbar__actions">
                     <!-- Barre de recherche -->
-                    <div class="pl-search">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <div class="pl-search" [class.pl-search--loading]="rechercheEnCours">
+                        <svg *ngIf="!rechercheEnCours" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <span *ngIf="rechercheEnCours" class="pl-search__spinner"></span>
                         <input
                             class="pl-search__input"
                             type="text"
                             [(ngModel)]="recherche"
-                            (input)="filtrerProduits()"
+                            (input)="onRecherche()"
                             placeholder="Rechercher un maillot..." />
-                        <button *ngIf="recherche" class="pl-search__clear" (click)="recherche=''; filtrerProduits()">
+                        <button *ngIf="recherche" class="pl-search__clear" (click)="recherche=''; produitsBase=produits; filtrerProduits()">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                         </button>
                     </div>
@@ -857,6 +860,18 @@ type VueMode = 'grid-classic' | 'grid-premium' | 'masonry' | 'list' | 'mini' | '
             transition: border-color 0.2s ease; color: #888;
         }
         .pl-search:focus-within { border-color: #FF4500; color: #FF4500; }
+        .pl-search--loading { border-color: #FF6B35; }
+        .pl-search__spinner {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border: 2px solid rgba(255,107,53,0.2);
+            border-top-color: #FF6B35;
+            border-radius: 50%;
+            animation: pl-spin 0.7s linear infinite;
+            flex-shrink: 0;
+        }
+        @keyframes pl-spin { to { transform: rotate(360deg); } }
         .pl-search__input {
             flex: 1; background: transparent; border: none; outline: none;
             color: #1a1a1a; font-size: 0.83rem; font-family: 'Poppins', sans-serif;
@@ -1371,11 +1386,15 @@ type VueMode = 'grid-classic' | 'grid-premium' | 'masonry' | 'list' | 'mini' | '
         }
     `]
 })
-export class ProductListComponent implements OnInit {
+export class ProductListComponent implements OnInit, OnDestroy {
     produits: Produit[] = [];
+    produitsBase: Produit[] = [];
     produitsFiltres: Produit[] = [];
     chargement = true;
+    rechercheEnCours = false;
     recherche = '';
+    private searchSubject = new Subject<string>();
+    private destroy$ = new Subject<void>();
     apercuVisible = false;
     produitSelectionne: Produit | null = null;
     private readonly fallbackImage = '/images/app/login.png';
@@ -1453,16 +1472,43 @@ export class ProductListComponent implements OnInit {
             }
         });
 
+        /* Pipeline de recherche avec debounce → API */
+        this.searchSubject.pipe(
+            debounceTime(380),
+            distinctUntilChanged(),
+            switchMap(terme => {
+                if (!terme.trim()) {
+                    this.rechercheEnCours = false;
+                    return of(this.produits);
+                }
+                this.rechercheEnCours = true;
+                return this.produitService.rechercherProduits(terme.trim());
+            })
+        ).subscribe({
+            next: (resultats) => {
+                this.rechercheEnCours = false;
+                this.produitsBase = resultats;
+                this.filtrerProduits();
+            },
+            error: () => { this.rechercheEnCours = false; }
+        });
+
         this.chargement = true;
         this.produitService.getProduits().subscribe({
             next: (data) => {
                 this.produits = data;
+                this.produitsBase = data;
                 this.filtrerProduits();
                 this.chargement = false;
                 setTimeout(() => this.animerCompteur(data.length), 300);
             },
             error: () => { this.chargement = false; }
         });
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     changerVue(mode: VueMode): void {
@@ -1482,18 +1528,15 @@ export class ProductListComponent implements OnInit {
         this.filtrerProduits();
     }
 
-    filtrerProduits(): void {
-        const terme = this.recherche.trim().toLowerCase();
-        const base = this.ongletActif === 'tous'
-            ? this.produits
-            : this.produits.filter((p) => this.categoryMatchesTab(p.categorie, this.ongletActif));
+    onRecherche(): void {
+        this.searchSubject.next(this.recherche);
+    }
 
-        this.produitsFiltres = !terme
-            ? base
-            : base.filter((p) =>
-                [p.nom, p.description, p.categorie, p.equipe]
-                    .filter(Boolean).join(' ').toLowerCase().includes(terme)
-            );
+    filtrerProduits(): void {
+        const base = this.ongletActif === 'tous'
+            ? this.produitsBase
+            : this.produitsBase.filter((p) => this.categoryMatchesTab(p.categorie, this.ongletActif));
+        this.produitsFiltres = base;
         this.currentPage = 0;
     }
 
@@ -1515,6 +1558,7 @@ export class ProductListComponent implements OnInit {
 
     reinitialiserFiltres(): void {
         this.recherche = '';
+        this.produitsBase = this.produits;
         this.changerOnglet('tous');
     }
 

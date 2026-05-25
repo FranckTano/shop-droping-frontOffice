@@ -1,288 +1,324 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
-import { CheckboxModule } from 'primeng/checkbox';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { InputTextModule } from 'primeng/inputtext';
-import { RippleModule } from 'primeng/ripple';
-import { ToastModule } from 'primeng/toast';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { SkeletonModule } from 'primeng/skeleton';
 import { ProduitService, Produit } from '@services/produit.service';
 import { PanierService, OptionsMaillot } from '@services/panier.service';
-import { SkeletonModule } from 'primeng/skeleton';
 import { AnalyticsService } from '@services/analytics.service';
 
 @Component({
     selector: 'app-product-overview',
     standalone: true,
-    imports: [
-        CommonModule, FormsModule, InputNumberModule, ButtonModule,
-        RippleModule, CheckboxModule, InputTextModule, ToastModule, SkeletonModule
-    ],
+    imports: [CommonModule, FormsModule, ToastModule, SkeletonModule, RouterModule],
     providers: [MessageService],
     template: `
         <p-toast></p-toast>
 
         <div class="po-shell">
 
-            <!-- TOPBAR NAV -->
-            <div class="po-topbar">
+            <!-- Fil d'Ariane -->
+            <div class="po-breadcrumb">
                 <div class="po-container">
-                    <button class="po-back-btn" (click)="retourBoutique()">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-                        Retour à la boutique
-                    </button>
-                    <button class="po-cart-btn" (click)="allerAuPanier()">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-                        Voir le panier
-                    </button>
+                    <a routerLink="/boutique" class="po-crumb-link">Boutique</a>
+                    <span class="po-crumb-sep">›</span>
+                    <span class="po-crumb-current">{{ produit?.nom ?? 'Chargement...' }}</span>
                 </div>
             </div>
 
             <!-- SKELETON -->
-            <div *ngIf="chargement" class="po-container">
-                <div class="po-grid">
-                    <p-skeleton height="580px" borderRadius="1rem"></p-skeleton>
-                    <div style="padding: 1rem;">
-                        <p-skeleton width="40%" height="1rem" styleClass="mb-3"></p-skeleton>
-                        <p-skeleton width="75%" height="2.5rem" styleClass="mb-2"></p-skeleton>
-                        <p-skeleton width="30%" height="2rem" styleClass="mb-4"></p-skeleton>
-                        <p-skeleton height="1px" styleClass="mb-4"></p-skeleton>
-                        <p-skeleton height="5rem" styleClass="mb-3"></p-skeleton>
-                        <p-skeleton height="5rem" styleClass="mb-3"></p-skeleton>
-                        <p-skeleton height="4rem"></p-skeleton>
-                    </div>
+            <div *ngIf="chargement" class="po-container po-skeleton-grid">
+                <p-skeleton height="560px" borderRadius="1rem"></p-skeleton>
+                <div style="padding:0.5rem">
+                    <p-skeleton width="35%" height="0.9rem" styleClass="mb-3"></p-skeleton>
+                    <p-skeleton width="70%" height="2.2rem" styleClass="mb-3"></p-skeleton>
+                    <p-skeleton width="25%" height="1.8rem" styleClass="mb-4"></p-skeleton>
+                    <p-skeleton height="4rem" styleClass="mb-3"></p-skeleton>
+                    <p-skeleton height="4rem" styleClass="mb-3"></p-skeleton>
+                    <p-skeleton height="6rem" styleClass="mb-3"></p-skeleton>
+                    <p-skeleton height="3.5rem"></p-skeleton>
                 </div>
             </div>
 
-            <!-- PRODUCT DETAIL -->
-            <div *ngIf="!chargement && produit" class="po-container">
-                <div class="po-grid">
+            <!-- CONTENU -->
+            <div *ngIf="!chargement && produit" class="po-container po-grid">
 
-                    <!-- IMAGE COLUMN -->
-                    <div class="po-media">
-                        <div class="po-media__frame">
-                            <span class="po-media__badge">{{ produit.categorie | uppercase }}</span>
-                            <span class="po-media__stock" [class.po-media__stock--low]="produit.stockTotal > 0 && produit.stockTotal < 8">
-                                <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg>
-                                {{ stockLabel() }}
-                            </span>
-                            <img
-                                [src]="produitService.resolveImageUrl(produit.imageUrl)"
-                                [alt]="produit.nom"
-                                class="po-media__img"
-                                loading="lazy"
-                                (error)="onImageError($event)" />
-                            <div class="po-media__glow"></div>
+                <!-- ══ COLONNE IMAGE ══ -->
+                <div class="po-media">
+
+                    <!-- Cadre image avec overlays de prévisualisation -->
+                    <div class="po-media__frame">
+
+                        <!-- Badge catégorie -->
+                        <span class="po-media__cat-badge">{{ labelCategorie(produit.categorie) }}</span>
+
+                        <!-- Badge stock -->
+                        <span class="po-media__stock" [class.po-media__stock--low]="produit.stockTotal > 0 && produit.stockTotal < 8">
+                            <svg width="7" height="7" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg>
+                            {{ stockLabel() }}
+                        </span>
+
+                        <!-- Image maillot -->
+                        <img
+                            [src]="produitService.resolveImageUrl(produit.imageUrl)"
+                            [alt]="produit.nom"
+                            class="po-media__img"
+                            loading="lazy"
+                            (error)="onImageError($event)" />
+
+                        <!-- ═══ OVERLAY BADGES OFFICIELS ═══ -->
+                        <div *ngIf="badgesOfficiels" class="po-overlay-badges">
+                            <div class="po-overlay-badges__patch">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            </div>
+                            <div class="po-overlay-badges__patch">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+                            </div>
+                            <span class="po-overlay-badges__label">Badges officiels</span>
                         </div>
 
-                        <!-- Feature pills -->
-                        <div class="po-features">
-                            <div class="po-feature">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-                                <span>{{ produit.equipe }}</span>
+                        <!-- ═══ OVERLAY FLOCAGE ═══ -->
+                        <div class="po-overlay-flocage" *ngIf="flocage && (flocageNom.trim() || flocageNumero.trim())">
+                            <span class="po-overlay-flocage__nom" *ngIf="flocageNom.trim()">
+                                {{ flocageNom.toUpperCase() }}
+                            </span>
+                            <span class="po-overlay-flocage__numero" *ngIf="flocageNumero.trim()">
+                                {{ flocageNumero }}
+                            </span>
+                        </div>
+
+                        <!-- Indicateur "Aperçu dos" si flocage actif -->
+                        <div *ngIf="flocage" class="po-media__dos-hint">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            Aperçu dos du maillot
+                        </div>
+                    </div>
+
+                    <!-- Indicateurs options actives sous l'image -->
+                    <div class="po-media__options-actives" *ngIf="badgesOfficiels || flocage">
+                        <span *ngIf="badgesOfficiels" class="po-option-chip po-option-chip--badges">
+                            ⭐ Badges officiels
+                        </span>
+                        <span *ngIf="flocage && (flocageNom.trim() || flocageNumero.trim())" class="po-option-chip po-option-chip--flocage">
+                            ✏️ {{ flocageNom.trim() || '' }}{{ flocageNom.trim() && flocageNumero.trim() ? ' #' : (flocageNumero.trim() ? '#' : '') }}{{ flocageNumero.trim() || '' }}
+                        </span>
+                    </div>
+
+                    <!-- Caractéristiques produit -->
+                    <div class="po-features">
+                        <div class="po-feature">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                            {{ produit.equipe || produit.marque || 'Premium' }}
+                        </div>
+                        <div class="po-feature">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                            100 % personnalisable
+                        </div>
+                        <div class="po-feature">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                            Livraison 2–5 jours
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ══ COLONNE CONFIG ══ -->
+                <div class="po-config">
+
+                    <!-- En-tête produit -->
+                    <span class="po-config__kicker">{{ labelCategorie(produit.categorie) }}</span>
+                    <h1 class="po-config__title">{{ produit.nom }}</h1>
+
+                    <div class="po-config__price-row">
+                        <div class="po-config__price">
+                            <strong>{{ formatPrix(prixTotal()) }}</strong>
+                            <span>FCFA</span>
+                        </div>
+                        <!-- Badges Sur commande -->
+                        <div class="po-sur-commande">
+                            <span class="po-sur-commande__badge">⏱ Sur commande</span>
+                            <span class="po-sur-commande__delai">🚚 2–5 jours</span>
+                        </div>
+                    </div>
+
+                    <p class="po-config__desc">{{ produit.description || 'Maillot officiel de haute qualité avec finitions premium.' }}</p>
+
+                    <div class="po-divider"></div>
+
+                    <!-- Taille -->
+                    <div class="po-selector">
+                        <div class="po-selector__header">
+                            <span class="po-selector__label">Taille</span>
+                            <strong *ngIf="tailleSelectionnee" class="po-selector__selected">{{ tailleSelectionnee }}</strong>
+                        </div>
+                        <div class="po-chip-row">
+                            <button *ngFor="let t of taillesDisponibles"
+                                    class="po-chip"
+                                    [class.po-chip--active]="tailleSelectionnee === t"
+                                    (click)="tailleSelectionnee = t">{{ t }}</button>
+                        </div>
+                    </div>
+
+                    <!-- Couleur -->
+                    <div class="po-selector">
+                        <div class="po-selector__header">
+                            <span class="po-selector__label">Couleur</span>
+                            <strong *ngIf="couleurSelectionnee" class="po-selector__selected">{{ couleurSelectionnee }}</strong>
+                        </div>
+                        <div class="po-chip-row">
+                            <button *ngFor="let c of couleursDisponibles"
+                                    class="po-chip"
+                                    [class.po-chip--active]="couleurSelectionnee === c"
+                                    (click)="couleurSelectionnee = c">{{ c }}</button>
+                        </div>
+                    </div>
+
+                    <div class="po-divider"></div>
+
+                    <!-- Options premium -->
+                    <div class="po-options-card">
+                        <h3 class="po-options-card__title">Options personnalisation</h3>
+
+                        <!-- Badges officiels -->
+                        <div class="po-option-row" (click)="badgesOfficiels = !badgesOfficiels">
+                            <div class="po-option-row__icon po-option-row__icon--gold">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                             </div>
-                            <div class="po-feature">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                                <span>100% personnalisable</span>
+                            <div class="po-option-row__info">
+                                <span class="po-option-row__name">Badges officiels</span>
+                                <span class="po-option-row__desc">Écussons brodés sur les manches</span>
                             </div>
-                            <div class="po-feature">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                                <span>{{ produit.marque || 'Premium quality' }}</span>
+                            <div class="po-option-row__right">
+                                <span class="po-option-row__price">+{{ formatPrix(prixBadgesOfficiels) }} FCFA</span>
+                                <div class="po-toggle" [class.po-toggle--on]="badgesOfficiels">
+                                    <div class="po-toggle__knob"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Flocage -->
+                        <div class="po-option-row" (click)="flocage = !flocage">
+                            <div class="po-option-row__icon po-option-row__icon--orange">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                            </div>
+                            <div class="po-option-row__info">
+                                <span class="po-option-row__name">Flocage personnalisé</span>
+                                <span class="po-option-row__desc">Nom + numéro dans le dos</span>
+                            </div>
+                            <div class="po-option-row__right">
+                                <span class="po-option-row__price">+{{ formatPrix(prixFlocageParLettre) }} FCFA/lettre</span>
+                                <div class="po-toggle" [class.po-toggle--on]="flocage">
+                                    <div class="po-toggle__knob"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Inputs flocage -->
+                        <div *ngIf="flocage" class="po-flocage-zone">
+                            <div class="po-flocage-preview-hint">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                Saisissez ci-dessous — la prévisualisation s'affiche sur l'image
+                            </div>
+                            <div class="po-flocage-inputs">
+                                <div class="po-input-group">
+                                    <label>Nom à floquer</label>
+                                    <input class="po-input" type="text" [(ngModel)]="flocageNom" placeholder="Ex : MBAPPÉ" maxlength="20" />
+                                </div>
+                                <div class="po-input-group">
+                                    <label>Numéro</label>
+                                    <input class="po-input" type="text" [(ngModel)]="flocageNumero" placeholder="Ex : 10" maxlength="3" />
+                                </div>
+                            </div>
+                            <div *ngIf="prixFlocageTotal() > 0" class="po-flocage-cost">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                Coût flocage : {{ formatPrix(prixFlocageTotal()) }} FCFA
                             </div>
                         </div>
                     </div>
 
-                    <!-- INFO COLUMN -->
-                    <div class="po-info">
-
-                        <span class="po-info__kicker">{{ labelCategorie(produit.categorie) }}</span>
-                        <h1 class="po-info__title">{{ produit.nom }}</h1>
-
-                        <div class="po-info__price">
-                            <strong>{{ formatPrix(produit.prix) }}</strong>
-                            <span>FCFA</span>
-                        </div>
-
-                        <!-- Badge Sur commande + délai -->
-                        <div class="po-sur-commande">
-                            <div class="po-sur-commande__badge">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                Sur commande
-                            </div>
-                            <div class="po-sur-commande__delai">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-                                Livraison 2–5 jours ouvrés
-                            </div>
-                        </div>
-
-                        <p class="po-info__desc">{{ produit.description || 'Maillot officiel de haute qualité avec finitions premium.' }}</p>
-
-                        <div class="po-divider"></div>
-
-                        <!-- Taille -->
-                        <div class="po-selector">
-                            <div class="po-selector__label">
-                                <span>Taille</span>
-                                <strong *ngIf="tailleSelectionnee">{{ tailleSelectionnee }}</strong>
-                            </div>
-                            <div class="po-chip-row">
-                                <button
-                                    *ngFor="let taille of taillesDisponibles"
-                                    class="po-chip"
-                                    [class.po-chip--active]="tailleSelectionnee === taille"
-                                    (click)="tailleSelectionnee = taille">
-                                    {{ taille }}
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Couleur -->
-                        <div class="po-selector">
-                            <div class="po-selector__label">
-                                <span>Couleur</span>
-                                <strong *ngIf="couleurSelectionnee">{{ couleurSelectionnee }}</strong>
-                            </div>
-                            <div class="po-chip-row">
-                                <button
-                                    *ngFor="let couleur of couleursDisponibles"
-                                    class="po-chip"
-                                    [class.po-chip--active]="couleurSelectionnee === couleur"
-                                    (click)="couleurSelectionnee = couleur">
-                                    {{ couleur }}
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Options premium -->
-                        <div class="po-options">
-                            <h3 class="po-options__title">Options premium</h3>
-
-                            <label class="po-option-toggle">
-                                <div class="po-option-toggle__left">
-                                    <div class="po-option-toggle__icon">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
-                                    </div>
-                                    <div>
-                                        <span class="po-option-toggle__name">Badges officiels</span>
-                                        <span class="po-option-toggle__price">+{{ formatPrix(prixBadgesOfficiels) }} FCFA</span>
-                                    </div>
-                                </div>
-                                <div class="po-toggle-switch" [class.po-toggle-switch--on]="badgesOfficiels" (click)="badgesOfficiels = !badgesOfficiels">
-                                    <div class="po-toggle-switch__knob"></div>
-                                </div>
-                            </label>
-
-                            <label class="po-option-toggle">
-                                <div class="po-option-toggle__left">
-                                    <div class="po-option-toggle__icon">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                                    </div>
-                                    <div>
-                                        <span class="po-option-toggle__name">Flocage personnalisé</span>
-                                        <span class="po-option-toggle__price">+{{ formatPrix(prixFlocageParLettre) }} FCFA / lettre</span>
-                                    </div>
-                                </div>
-                                <div class="po-toggle-switch" [class.po-toggle-switch--on]="flocage" (click)="flocage = !flocage">
-                                    <div class="po-toggle-switch__knob"></div>
-                                </div>
-                            </label>
-
-                            <div *ngIf="flocage" class="po-flocage-inputs">
-                                <div class="po-input-group">
-                                    <label>Nom à floquer</label>
-                                    <input pInputText [(ngModel)]="flocageNom" placeholder="Ex: MBAPPÉ" class="po-input" />
-                                </div>
-                                <div class="po-input-group">
-                                    <label>Numéro</label>
-                                    <input pInputText [(ngModel)]="flocageNumero" placeholder="Ex: 10" class="po-input" />
-                                </div>
-                                <div class="po-flocage-cost" *ngIf="prixFlocageTotal() > 0">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF4500" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                                    Coût flocage : {{ formatPrix(prixFlocageTotal()) }} FCFA
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Quantité -->
-                        <div class="po-qty-row">
-                            <span class="po-qty-label">Quantité</span>
-                            <div class="po-qty-ctrl">
-                                <button class="po-qty-btn" (click)="quantite = quantite - 1" [disabled]="quantite <= 1">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                </button>
-                                <span class="po-qty-val">{{ quantite }}</span>
-                                <button class="po-qty-btn" (click)="quantite = quantite + 1">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Résumé prix -->
-                        <div class="po-summary">
-                            <div class="po-summary__line">
-                                <span>Maillot</span>
-                                <span>{{ formatPrix(produit.prix) }} FCFA</span>
-                            </div>
-                            <div class="po-summary__line" *ngIf="prixOptionsUnitaire() > 0">
-                                <span>Options</span>
-                                <span class="po-summary__accent">+{{ formatPrix(prixOptionsUnitaire()) }} FCFA</span>
-                            </div>
-                            <div class="po-summary__line" *ngIf="quantite > 1">
-                                <span>Quantité</span>
-                                <span>× {{ quantite }}</span>
-                            </div>
-                            <div class="po-summary__total">
-                                <span>Total</span>
-                                <strong>{{ formatPrix(prixTotal()) }} FCFA</strong>
-                            </div>
-                        </div>
-
-                        <!-- CTAs -->
-                        <div class="po-actions">
-                            <button class="po-btn po-btn--primary" (click)="ajouterAuPanier()">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-                                Ajouter au panier
+                    <!-- Quantité -->
+                    <div class="po-qty-row">
+                        <span class="po-qty-label">Quantité</span>
+                        <div class="po-qty-ctrl">
+                            <button class="po-qty-btn" (click)="quantite = quantite - 1" [disabled]="quantite <= 1">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
                             </button>
-                            <button class="po-btn po-btn--whatsapp" (click)="ajouterAuPanier(true)">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
-                                Commander via WhatsApp
+                            <span class="po-qty-val">{{ quantite }}</span>
+                            <button class="po-qty-btn" (click)="quantite = quantite + 1">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                             </button>
                         </div>
+                    </div>
 
-                        <!-- Tabs description/livraison -->
-                        <div class="po-tabs">
-                            <div class="po-tabs__nav">
-                                <button class="po-tab-btn" [class.po-tab-btn--active]="tabActif === 'desc'" (click)="tabActif = 'desc'">Description</button>
-                                <button class="po-tab-btn" [class.po-tab-btn--active]="tabActif === 'livraison'" (click)="tabActif = 'livraison'">Livraison</button>
-                            </div>
-                            <div class="po-tabs__content">
-                                <p *ngIf="tabActif === 'desc'">
-                                    {{ produit.description || 'Maillot officiel de haute qualité avec finitions premium.' }}
-                                </p>
-                                <div *ngIf="tabActif === 'livraison'" class="po-livraison-info">
-                                    <div class="po-livraison-item">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                        <div>
-                                            <strong>Produit sur commande</strong>
-                                            <p>Ce maillot est commandé auprès du fournisseur après validation de votre commande. Délai de préparation : 24h.</p>
-                                        </div>
+                    <!-- Résumé prix -->
+                    <div class="po-summary">
+                        <div class="po-summary__line">
+                            <span>Maillot × {{ quantite }}</span>
+                            <span>{{ formatPrix(produit.prix * quantite) }} FCFA</span>
+                        </div>
+                        <div class="po-summary__line" *ngIf="badgesOfficiels">
+                            <span>Badges officiels</span>
+                            <span class="po-summary__plus">+{{ formatPrix(prixBadgesOfficiels * quantite) }} FCFA</span>
+                        </div>
+                        <div class="po-summary__line" *ngIf="prixFlocageTotal() > 0">
+                            <span>Flocage</span>
+                            <span class="po-summary__plus">+{{ formatPrix(prixFlocageTotal() * quantite) }} FCFA</span>
+                        </div>
+                        <div class="po-summary__total">
+                            <span>Total</span>
+                            <strong>{{ formatPrix(prixTotal()) }} FCFA</strong>
+                        </div>
+                    </div>
+
+                    <!-- CTAs -->
+                    <div class="po-actions">
+                        <button class="po-btn po-btn--primary" (click)="ajouterAuPanier()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+                            Ajouter au panier
+                        </button>
+                        <button class="po-btn po-btn--whatsapp" (click)="ajouterAuPanier(true)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+                            Commander via WhatsApp
+                        </button>
+                    </div>
+
+                    <!-- Onglets -->
+                    <div class="po-tabs">
+                        <div class="po-tabs__nav">
+                            <button class="po-tab-btn" [class.po-tab-btn--active]="tabActif === 'desc'" (click)="tabActif = 'desc'">Description</button>
+                            <button class="po-tab-btn" [class.po-tab-btn--active]="tabActif === 'livraison'" (click)="tabActif = 'livraison'">Livraison</button>
+                        </div>
+                        <div class="po-tabs__content">
+                            <p *ngIf="tabActif === 'desc'" class="po-tabs__text">
+                                {{ produit.description || 'Maillot officiel de haute qualité avec finitions premium.' }}
+                            </p>
+                            <div *ngIf="tabActif === 'livraison'" class="po-livraison-list">
+                                <div class="po-livraison-item">
+                                    <div class="po-livraison-item__icon">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                                     </div>
-                                    <div class="po-livraison-item">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-                                        <div>
-                                            <strong>Livraison 2–5 jours ouvrés</strong>
-                                            <p>Livraison à domicile ou en point relais à Abidjan. Les frais sont confirmés via WhatsApp.</p>
-                                        </div>
+                                    <div>
+                                        <strong>Sur commande</strong>
+                                        <p>Commandé auprès du fournisseur après validation. Préparation sous 24h.</p>
                                     </div>
-                                    <div class="po-livraison-item">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
-                                        <div>
-                                            <strong>Suivi via WhatsApp</strong>
-                                            <p>Vous êtes informé(e) à chaque étape : confirmation, expédition, livraison.</p>
-                                        </div>
+                                </div>
+                                <div class="po-livraison-item">
+                                    <div class="po-livraison-item__icon">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                                    </div>
+                                    <div>
+                                        <strong>Livraison 2–5 jours</strong>
+                                        <p>À domicile ou en point relais à Abidjan. Frais confirmés via WhatsApp.</p>
+                                    </div>
+                                </div>
+                                <div class="po-livraison-item">
+                                    <div class="po-livraison-item__icon">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+                                    </div>
+                                    <div>
+                                        <strong>Suivi WhatsApp</strong>
+                                        <p>Vous êtes informé(e) à chaque étape : confirmation, expédition, livraison.</p>
                                     </div>
                                 </div>
                             </div>
@@ -295,131 +331,107 @@ import { AnalyticsService } from '@services/analytics.service';
     styles: [`
         :host {
             display: block;
-            background: #0a0a0a;
-            color: #ffffff;
+            background: #FAF7F2;
+            color: #1A1A1A;
             font-family: 'Poppins', 'Segoe UI', sans-serif;
             min-height: 100vh;
         }
 
-        .po-shell {
-            padding-bottom: 5rem;
-        }
+        /* ── Container ── */
+        .po-shell { padding-bottom: 4rem; }
 
         .po-container {
-            max-width: 1320px;
+            max-width: 1280px;
             margin: 0 auto;
             padding: 0 1.5rem;
         }
 
-        /* ===== TOPBAR ===== */
-        .po-topbar {
-            padding: 1.5rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        /* ── Breadcrumb ── */
+        .po-breadcrumb {
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
             margin-bottom: 2rem;
         }
 
-        .po-topbar .po-container {
+        .po-breadcrumb .po-container {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            gap: 1rem;
-        }
-
-        .po-back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 0.5rem;
-            color: rgba(255, 255, 255, 0.6);
+            gap: 0.4rem;
             font-size: 0.82rem;
-            cursor: pointer;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.2s ease;
         }
 
-        .po-back-btn:hover {
-            border-color: rgba(255, 255, 255, 0.3);
-            color: #ffffff;
+        .po-crumb-link {
+            color: #8B7355;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .po-crumb-link:hover { color: #1A1A1A; }
+        .po-crumb-sep { color: #AAAAAA; }
+        .po-crumb-current { color: #1A1A1A; font-weight: 500; }
+
+        /* ── Skeleton ── */
+        .po-skeleton-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            padding-top: 1rem;
         }
 
-        .po-cart-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1.2rem;
-            background: rgba(255, 69, 0, 0.1);
-            border: 1px solid rgba(255, 69, 0, 0.25);
-            border-radius: 0.5rem;
-            color: #FF4500;
-            font-size: 0.82rem;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.2s ease;
-        }
-
-        .po-cart-btn:hover {
-            background: rgba(255, 69, 0, 0.18);
-            border-color: rgba(255, 69, 0, 0.5);
-        }
-
-        /* ===== GRID ===== */
+        /* ── Grid principal ── */
         .po-grid {
             display: grid;
-            grid-template-columns: 1.05fr 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 3rem;
             align-items: start;
         }
 
-        /* ===== MEDIA ===== */
+        /* ══════════════════════════
+           COLONNE IMAGE
+        ══════════════════════════ */
         .po-media__frame {
             position: relative;
-            border-radius: 1.2rem;
+            border-radius: 1.25rem;
             overflow: hidden;
-            background: #111111;
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            aspect-ratio: 4 / 5;
+            background: #FFFFFF;
+            border: 1px solid rgba(0,0,0,0.07);
+            aspect-ratio: 3 / 4;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
         }
 
-        .po-media__badge {
+        .po-media__cat-badge {
             position: absolute;
             top: 1rem;
             left: 1rem;
-            z-index: 2;
-            padding: 0.3rem 0.75rem;
-            background: rgba(255, 69, 0, 0.9);
+            z-index: 3;
+            padding: 0.28rem 0.7rem;
+            background: #1A1A1A;
             color: #fff;
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             font-weight: 700;
             letter-spacing: 0.15em;
             border-radius: 999px;
-            backdrop-filter: blur(4px);
         }
 
         .po-media__stock {
             position: absolute;
             top: 1rem;
             right: 1rem;
-            z-index: 2;
+            z-index: 3;
             display: flex;
             align-items: center;
-            gap: 0.35rem;
-            padding: 0.3rem 0.75rem;
-            background: rgba(0, 200, 81, 0.15);
-            border: 1px solid rgba(0, 200, 81, 0.3);
-            color: #00C851;
-            font-size: 0.65rem;
+            gap: 0.3rem;
+            padding: 0.28rem 0.7rem;
+            background: rgba(0,200,81,0.12);
+            border: 1px solid rgba(0,200,81,0.3);
+            color: #00a844;
+            font-size: 0.62rem;
             font-weight: 600;
             border-radius: 999px;
         }
-
         .po-media__stock--low {
-            background: rgba(245, 166, 35, 0.15);
-            border-color: rgba(245, 166, 35, 0.3);
-            color: #F5A623;
+            background: rgba(245,166,35,0.12);
+            border-color: rgba(245,166,35,0.3);
+            color: #c47d00;
         }
 
         .po-media__img {
@@ -429,320 +441,437 @@ import { AnalyticsService } from '@services/analytics.service';
             display: block;
             transition: transform 0.5s ease;
         }
-
         .po-media__frame:hover .po-media__img { transform: scale(1.03); }
 
-        .po-media__glow {
+        /* ═══ OVERLAY BADGES ═══ */
+        .po-overlay-badges {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 40%;
-            background: linear-gradient(to top, rgba(255, 69, 0, 0.08), transparent);
-            pointer-events: none;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+            animation: overlayFadeIn 0.3s ease;
         }
 
+        .po-overlay-badges__patch {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7a4500;
+            box-shadow: 0 4px 12px rgba(255,165,0,0.4);
+            border: 2.5px solid rgba(255,255,255,0.7);
+        }
+
+        .po-overlay-badges__label {
+            background: rgba(0,0,0,0.65);
+            color: #FFD700;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            backdrop-filter: blur(4px);
+        }
+
+        /* ═══ OVERLAY FLOCAGE ═══ */
+        .po-overlay-flocage {
+            position: absolute;
+            bottom: 18%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+            pointer-events: none;
+            animation: overlayFadeIn 0.2s ease;
+        }
+
+        .po-overlay-flocage__nom {
+            font-family: 'Impact', 'Arial Black', 'Poppins', sans-serif;
+            font-size: clamp(1.1rem, 3.5vw, 1.8rem);
+            font-weight: 900;
+            letter-spacing: 0.12em;
+            color: #FFFFFF;
+            text-shadow:
+                2px 2px 0 #000,
+                -2px 2px 0 #000,
+                2px -2px 0 #000,
+                -2px -2px 0 #000,
+                0 3px 8px rgba(0,0,0,0.5);
+            line-height: 1.1;
+            white-space: nowrap;
+        }
+
+        .po-overlay-flocage__numero {
+            font-family: 'Impact', 'Arial Black', 'Poppins', sans-serif;
+            font-size: clamp(1.8rem, 6vw, 3.2rem);
+            font-weight: 900;
+            color: #FFFFFF;
+            text-shadow:
+                2px 2px 0 #000,
+                -2px 2px 0 #000,
+                2px -2px 0 #000,
+                -2px -2px 0 #000,
+                0 4px 12px rgba(0,0,0,0.6);
+            line-height: 1;
+        }
+
+        .po-media__dos-hint {
+            position: absolute;
+            bottom: 0.75rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: rgba(0,0,0,0.55);
+            color: rgba(255,255,255,0.85);
+            font-size: 0.67rem;
+            font-weight: 500;
+            padding: 0.25rem 0.7rem;
+            border-radius: 999px;
+            backdrop-filter: blur(4px);
+            white-space: nowrap;
+        }
+
+        @keyframes overlayFadeIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(6px); }
+            to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        /* Options actives sous image */
+        .po-media__options-actives {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin-top: 0.75rem;
+        }
+
+        .po-option-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.3rem 0.75rem;
+            border-radius: 999px;
+        }
+
+        .po-option-chip--badges {
+            background: rgba(255,215,0,0.15);
+            border: 1px solid rgba(255,165,0,0.35);
+            color: #a06200;
+        }
+
+        .po-option-chip--flocage {
+            background: rgba(255,107,53,0.12);
+            border: 1px solid rgba(255,107,53,0.3);
+            color: #c84b00;
+        }
+
+        /* Caractéristiques */
         .po-features {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
+            gap: 0.4rem;
             margin-top: 1rem;
         }
 
         .po-feature {
             display: flex;
             align-items: center;
-            gap: 0.4rem;
-            padding: 0.4rem 0.75rem;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.07);
+            gap: 0.35rem;
+            padding: 0.35rem 0.75rem;
+            background: #FFFFFF;
+            border: 1px solid rgba(0,0,0,0.08);
             border-radius: 999px;
             font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.55);
+            color: #555;
         }
 
-        .po-feature svg { color: rgba(255, 69, 0, 0.7); flex-shrink: 0; }
+        .po-feature svg { color: #FF6B35; flex-shrink: 0; }
 
-        /* ===== INFO ===== */
-        .po-info {
-            padding-top: 0.5rem;
-        }
+        /* ══════════════════════════
+           COLONNE CONFIG
+        ══════════════════════════ */
+        .po-config { padding-top: 0.25rem; }
 
-        .po-info__kicker {
+        .po-config__kicker {
             display: inline-block;
-            font-size: 0.65rem;
+            font-size: 0.62rem;
             font-weight: 700;
             letter-spacing: 0.2em;
-            color: #FF4500;
-            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            color: #FF6B35;
+            margin-bottom: 0.6rem;
         }
 
-        .po-info__title {
-            font-size: clamp(1.8rem, 3vw, 2.5rem);
+        .po-config__title {
+            font-size: clamp(1.7rem, 2.8vw, 2.4rem);
             font-weight: 800;
             line-height: 1.1;
-            color: #ffffff;
+            color: #1A1A1A;
             margin: 0 0 1rem;
             letter-spacing: -0.01em;
         }
 
-        .po-info__price {
+        .po-config__price-row {
             display: flex;
-            align-items: baseline;
-            gap: 0.4rem;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.75rem;
             margin-bottom: 1rem;
         }
 
-        .po-info__price strong {
-            font-size: 2.2rem;
+        .po-config__price {
+            display: flex;
+            align-items: baseline;
+            gap: 0.35rem;
+        }
+
+        .po-config__price strong {
+            font-size: 2rem;
             font-weight: 800;
-            color: #FF4500;
+            color: #FF6B35;
             line-height: 1;
         }
 
-        .po-info__price span {
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.45);
-        }
-
-        /* Sur commande badge */
-        .po-sur-commande {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-            margin: 0.6rem 0 1.2rem;
-        }
-
-        .po-sur-commande__badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            background: rgba(255, 107, 53, 0.15);
-            color: #FF6B35;
-            border: 1px solid rgba(255, 107, 53, 0.35);
-            border-radius: 999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.3rem 0.75rem;
-            white-space: nowrap;
-        }
-
-        .po-sur-commande__delai {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            background: rgba(255, 255, 255, 0.06);
-            color: rgba(255, 255, 255, 0.65);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            padding: 0.3rem 0.75rem;
-            white-space: nowrap;
-        }
-
-        /* Infos livraison tab */
-        .po-livraison-info {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .po-livraison-item {
-            display: flex;
-            gap: 0.85rem;
-            align-items: flex-start;
-        }
-
-        .po-livraison-item svg {
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .po-livraison-item strong {
-            display: block;
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.9);
-            margin-bottom: 0.2rem;
-        }
-
-        .po-livraison-item p {
-            font-size: 0.8rem;
-            color: rgba(255,255,255,0.5);
-            margin: 0;
-            line-height: 1.5;
-        }
-
-        .po-info__desc {
-            color: rgba(255, 255, 255, 0.5);
+        .po-config__price span {
             font-size: 0.9rem;
+            color: #888;
+        }
+
+        .po-config__desc {
+            font-size: 0.88rem;
+            color: #666;
             line-height: 1.7;
-            margin: 0 0 1.2rem;
+            margin: 0 0 1rem;
         }
 
         .po-divider {
             height: 1px;
-            background: rgba(255, 255, 255, 0.07);
-            margin: 1.2rem 0;
+            background: rgba(0,0,0,0.07);
+            margin: 1rem 0;
         }
 
-        /* ===== SELECTORS ===== */
-        .po-selector {
-            margin-bottom: 1.2rem;
+        /* Sur commande badges */
+        .po-sur-commande { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+        .po-sur-commande__badge {
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0.25rem 0.65rem;
+            background: rgba(255,107,53,0.1);
+            border: 1px solid rgba(255,107,53,0.3);
+            color: #c84b00;
+            border-radius: 999px;
         }
 
-        .po-selector__label {
+        .po-sur-commande__delai {
+            font-size: 0.72rem;
+            padding: 0.25rem 0.65rem;
+            background: rgba(0,0,0,0.04);
+            border: 1px solid rgba(0,0,0,0.1);
+            color: #666;
+            border-radius: 999px;
+        }
+
+        /* Sélecteurs taille/couleur */
+        .po-selector { margin-bottom: 1.1rem; }
+
+        .po-selector__header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 0.6rem;
+            margin-bottom: 0.55rem;
         }
 
-        .po-selector__label span {
-            font-size: 0.82rem;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.5);
-            letter-spacing: 0.08em;
+        .po-selector__label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
+            color: #888;
         }
 
-        .po-selector__label strong {
+        .po-selector__selected {
             font-size: 0.82rem;
-            color: #FF4500;
+            color: #FF6B35;
+            font-weight: 700;
         }
 
-        .po-chip-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-        }
+        .po-chip-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 
         .po-chip {
-            padding: 0.45rem 0.9rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 0.42rem 0.9rem;
+            background: #FFFFFF;
+            border: 1.5px solid rgba(0,0,0,0.12);
             border-radius: 0.5rem;
-            color: rgba(255, 255, 255, 0.6);
+            color: #444;
             font-size: 0.82rem;
             font-weight: 500;
             cursor: pointer;
             font-family: 'Poppins', sans-serif;
-            transition: all 0.2s ease;
+            transition: all 0.18s ease;
         }
 
         .po-chip:hover {
-            border-color: rgba(255, 255, 255, 0.25);
-            color: #ffffff;
+            border-color: #FF6B35;
+            color: #FF6B35;
         }
 
         .po-chip--active {
-            background: rgba(255, 69, 0, 0.15);
-            border-color: rgba(255, 69, 0, 0.5);
-            color: #FF4500;
+            background: #FF6B35;
+            border-color: #FF6B35;
+            color: #FFFFFF;
         }
 
-        /* ===== OPTIONS ===== */
-        .po-options {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.07);
+        /* Options premium card */
+        .po-options-card {
+            background: #FFFFFF;
+            border: 1px solid rgba(0,0,0,0.08);
             border-radius: 1rem;
-            padding: 1rem;
-            margin-bottom: 1.2rem;
+            padding: 1.1rem;
+            margin-bottom: 1.1rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
         }
 
-        .po-options__title {
-            font-size: 0.75rem;
+        .po-options-card__title {
+            font-size: 0.72rem;
             font-weight: 700;
             letter-spacing: 0.12em;
             text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.4);
-            margin: 0 0 0.9rem;
+            color: #AAAAAA;
+            margin: 0 0 0.85rem;
         }
 
-        .po-option-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            cursor: pointer;
-        }
-
-        .po-option-toggle:last-of-type { border-bottom: none; }
-
-        .po-option-toggle__left {
+        .po-option-row {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-        }
-
-        .po-option-toggle__icon {
-            width: 32px;
-            height: 32px;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: background 0.15s;
             border-radius: 0.5rem;
-            background: rgba(255, 69, 0, 0.1);
-            border: 1px solid rgba(255, 69, 0, 0.2);
+            padding: 0.75rem 0.5rem;
+            margin: 0 -0.5rem;
+        }
+        .po-option-row:last-of-type { border-bottom: none; }
+        .po-option-row:hover { background: rgba(0,0,0,0.02); }
+
+        .po-option-row__icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 0.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #FF4500;
             flex-shrink: 0;
         }
 
-        .po-option-toggle__name {
+        .po-option-row__icon--gold {
+            background: rgba(255,215,0,0.15);
+            border: 1px solid rgba(255,165,0,0.25);
+            color: #b07800;
+        }
+
+        .po-option-row__icon--orange {
+            background: rgba(255,107,53,0.1);
+            border: 1px solid rgba(255,107,53,0.2);
+            color: #FF6B35;
+        }
+
+        .po-option-row__info { flex: 1; min-width: 0; }
+
+        .po-option-row__name {
             display: block;
             font-size: 0.88rem;
             font-weight: 600;
-            color: #ffffff;
+            color: #1A1A1A;
         }
 
-        .po-option-toggle__price {
+        .po-option-row__desc {
             display: block;
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.73rem;
+            color: #AAAAAA;
         }
 
-        /* Toggle switch */
-        .po-toggle-switch {
-            width: 44px;
-            height: 24px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            position: relative;
-            cursor: pointer;
-            transition: background 0.25s ease, border-color 0.25s ease;
+        .po-option-row__right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.3rem;
             flex-shrink: 0;
         }
 
-        .po-toggle-switch--on {
-            background: rgba(255, 69, 0, 0.3);
-            border-color: rgba(255, 69, 0, 0.5);
+        .po-option-row__price {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #888;
         }
 
-        .po-toggle-switch__knob {
+        /* Toggle */
+        .po-toggle {
+            width: 42px;
+            height: 23px;
+            border-radius: 999px;
+            background: #E5E7EB;
+            border: 1.5px solid rgba(0,0,0,0.1);
+            position: relative;
+            cursor: pointer;
+            transition: background 0.25s, border-color 0.25s;
+        }
+
+        .po-toggle--on {
+            background: #FF6B35;
+            border-color: #FF6B35;
+        }
+
+        .po-toggle__knob {
             position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 16px;
-            height: 16px;
+            top: 2.5px;
+            left: 2.5px;
+            width: 15px;
+            height: 15px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.5);
-            transition: transform 0.25s ease, background 0.25s ease;
+            background: #FFFFFF;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+            transition: transform 0.25s ease;
         }
 
-        .po-toggle-switch--on .po-toggle-switch__knob {
-            transform: translateX(20px);
-            background: #FF4500;
-        }
+        .po-toggle--on .po-toggle__knob { transform: translateX(19px); }
 
         /* Flocage inputs */
+        .po-flocage-zone {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(0,0,0,0.06);
+        }
+
+        .po-flocage-preview-hint {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.72rem;
+            color: #FF6B35;
+            font-weight: 500;
+            margin-bottom: 0.65rem;
+        }
+
         .po-flocage-inputs {
-            margin-top: 0.8rem;
-            padding-top: 0.8rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 0.6rem;
@@ -755,73 +884,63 @@ import { AnalyticsService } from '@services/analytics.service';
         }
 
         .po-input-group label {
-            font-size: 0.72rem;
-            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.7rem;
+            color: #999;
+            font-weight: 600;
             letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
 
         .po-input {
             width: 100%;
             padding: 0.55rem 0.75rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            background: #FAF7F2;
+            border: 1.5px solid rgba(0,0,0,0.12);
             border-radius: 0.5rem;
-            color: #ffffff !important;
+            color: #1A1A1A;
             font-size: 0.85rem;
             font-family: 'Poppins', sans-serif;
             outline: none;
-            transition: border-color 0.2s ease;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
         }
 
         .po-input:focus {
-            border-color: rgba(255, 69, 0, 0.4) !important;
-        }
-
-        ::ng-deep .po-input.p-inputtext {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            border-radius: 0.5rem !important;
-            color: #ffffff !important;
-        }
-
-        ::ng-deep .po-input.p-inputtext:focus {
-            border-color: rgba(255, 69, 0, 0.4) !important;
-            box-shadow: none !important;
+            border-color: #FF6B35;
+            box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
         }
 
         .po-flocage-cost {
-            grid-column: 1 / -1;
             display: flex;
             align-items: center;
             gap: 0.4rem;
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.5);
-            margin-top: 0.25rem;
+            font-size: 0.78rem;
+            color: #888;
+            margin-top: 0.5rem;
         }
 
-        /* ===== QTY ===== */
+        /* Quantité */
         .po-qty-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
         }
 
         .po-qty-label {
-            font-size: 0.82rem;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.5);
-            letter-spacing: 0.08em;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
+            color: #888;
         }
 
         .po-qty-ctrl {
             display: flex;
             align-items: center;
-            gap: 0;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0.6rem;
+            background: #FFFFFF;
+            border: 1.5px solid rgba(0,0,0,0.12);
+            border-radius: 0.65rem;
             overflow: hidden;
         }
 
@@ -833,71 +952,72 @@ import { AnalyticsService } from '@services/analytics.service';
             justify-content: center;
             background: transparent;
             border: none;
-            color: rgba(255, 255, 255, 0.5);
+            color: #555;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.18s;
         }
 
         .po-qty-btn:hover:not(:disabled) {
-            background: rgba(255, 255, 255, 0.08);
-            color: #ffffff;
+            background: #FAF7F2;
+            color: #1A1A1A;
         }
 
         .po-qty-btn:disabled { opacity: 0.3; cursor: default; }
 
         .po-qty-val {
-            min-width: 42px;
+            min-width: 44px;
             text-align: center;
             font-size: 0.95rem;
             font-weight: 700;
-            color: #ffffff;
-            border-left: 1px solid rgba(255, 255, 255, 0.08);
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            color: #1A1A1A;
+            border-left: 1px solid rgba(0,0,0,0.08);
+            border-right: 1px solid rgba(0,0,0,0.08);
             line-height: 38px;
         }
 
-        /* ===== SUMMARY ===== */
+        /* Résumé prix */
         .po-summary {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: #FFFFFF;
+            border: 1px solid rgba(0,0,0,0.08);
             border-radius: 1rem;
             padding: 1rem;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.1rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
         }
 
         .po-summary__line {
             display: flex;
             justify-content: space-between;
-            font-size: 0.87rem;
-            color: rgba(255, 255, 255, 0.5);
-            padding: 0.3rem 0;
+            font-size: 0.86rem;
+            color: #888;
+            padding: 0.28rem 0;
         }
 
-        .po-summary__accent { color: #FF4500; }
+        .po-summary__plus { color: #FF6B35; font-weight: 600; }
 
         .po-summary__total {
             display: flex;
             justify-content: space-between;
             font-size: 1rem;
-            padding-top: 0.65rem;
+            padding-top: 0.6rem;
             margin-top: 0.35rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(0,0,0,0.07);
         }
 
-        .po-summary__total span { color: rgba(255, 255, 255, 0.7); font-weight: 600; }
+        .po-summary__total span { color: #444; font-weight: 600; }
 
         .po-summary__total strong {
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             font-weight: 800;
-            color: #FF4500;
+            color: #FF6B35;
         }
 
-        /* ===== ACTIONS ===== */
+        /* CTAs */
         .po-actions {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 0.75rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.4rem;
         }
 
         .po-btn {
@@ -905,49 +1025,51 @@ import { AnalyticsService } from '@services/analytics.service';
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            padding: 0.85rem 1.2rem;
-            border-radius: 0.7rem;
+            padding: 0.85rem 1rem;
+            border-radius: 0.75rem;
             font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
             border: none;
             font-family: 'Poppins', sans-serif;
-            transition: all 0.25s ease;
+            transition: all 0.22s ease;
         }
 
         .po-btn--primary {
-            background: #FF4500;
-            color: #ffffff;
-            box-shadow: 0 4px 20px rgba(255, 69, 0, 0.3);
+            background: #1A1A1A;
+            color: #FFFFFF;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
         }
 
         .po-btn--primary:hover {
-            background: #e03d00;
+            background: #333;
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(255, 69, 0, 0.45);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
         }
 
         .po-btn--whatsapp {
-            background: rgba(37, 211, 102, 0.12);
-            color: #25D366;
-            border: 1px solid rgba(37, 211, 102, 0.3);
+            background: rgba(37,211,102,0.1);
+            color: #18a34a;
+            border: 1.5px solid rgba(37,211,102,0.35);
         }
 
         .po-btn--whatsapp:hover {
-            background: rgba(37, 211, 102, 0.2);
-            border-color: rgba(37, 211, 102, 0.5);
+            background: rgba(37,211,102,0.18);
+            border-color: rgba(37,211,102,0.6);
         }
 
-        /* ===== TABS ===== */
+        /* Onglets */
         .po-tabs {
-            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: #FFFFFF;
+            border: 1px solid rgba(0,0,0,0.08);
             border-radius: 1rem;
             overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
         }
 
         .po-tabs__nav {
             display: flex;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            border-bottom: 1px solid rgba(0,0,0,0.07);
         }
 
         .po-tab-btn {
@@ -955,68 +1077,94 @@ import { AnalyticsService } from '@services/analytics.service';
             padding: 0.75rem;
             background: transparent;
             border: none;
-            color: rgba(255, 255, 255, 0.4);
+            color: #999;
             font-size: 0.82rem;
             font-weight: 600;
             cursor: pointer;
             font-family: 'Poppins', sans-serif;
-            transition: all 0.2s ease;
+            transition: all 0.18s;
             letter-spacing: 0.04em;
         }
 
-        .po-tab-btn:hover { color: rgba(255, 255, 255, 0.7); }
+        .po-tab-btn:hover { color: #555; }
 
         .po-tab-btn--active {
-            color: #FF4500;
-            background: rgba(255, 69, 0, 0.06);
-            border-bottom: 2px solid #FF4500;
+            color: #FF6B35;
+            background: rgba(255,107,53,0.05);
+            border-bottom: 2px solid #FF6B35;
         }
 
-        .po-tabs__content {
-            padding: 1rem;
-        }
+        .po-tabs__content { padding: 1rem; }
 
-        .po-tabs__content p {
-            color: rgba(255, 255, 255, 0.5);
+        .po-tabs__text {
+            color: #666;
             font-size: 0.88rem;
             line-height: 1.7;
             margin: 0;
         }
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 1024px) {
-            .po-grid {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
+        /* Livraison */
+        .po-livraison-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
 
-            .po-media__frame {
-                max-height: 450px;
-            }
+        .po-livraison-item {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+
+        .po-livraison-item__icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 0.5rem;
+            background: rgba(255,107,53,0.1);
+            border: 1px solid rgba(255,107,53,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FF6B35;
+            flex-shrink: 0;
+        }
+
+        .po-livraison-item strong {
+            display: block;
+            font-size: 0.85rem;
+            color: #1A1A1A;
+            margin-bottom: 0.15rem;
+        }
+
+        .po-livraison-item p {
+            font-size: 0.8rem;
+            color: #888;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* ═══ RESPONSIVE ═══ */
+        @media (max-width: 1024px) {
+            .po-grid, .po-skeleton-grid { grid-template-columns: 1fr; gap: 1.75rem; }
+            .po-media__frame { max-height: 480px; }
         }
 
         @media (max-width: 640px) {
-            .po-actions {
-                grid-template-columns: 1fr;
-            }
-
-            .po-flocage-inputs {
-                grid-template-columns: 1fr;
-            }
-
-            .po-topbar .po-container {
-                flex-wrap: wrap;
-            }
+            .po-container { padding: 0 1rem; }
+            .po-config__title { font-size: 1.6rem; }
+            .po-actions { grid-template-columns: 1fr; }
+            .po-flocage-inputs { grid-template-columns: 1fr; }
+            .po-config__price-row { flex-direction: column; align-items: flex-start; gap: 0.4rem; }
         }
     `]
 })
 export class ProductOverviewComponent implements OnInit {
-    private route = inject(ActivatedRoute);
-    private router = inject(Router);
-    public produitService = inject(ProduitService);
-    private panierService = inject(PanierService);
+    private route      = inject(ActivatedRoute);
+    private router     = inject(Router);
+    public  produitService = inject(ProduitService);
+    private panierService  = inject(PanierService);
     private messageService = inject(MessageService);
-    private analytics = inject(AnalyticsService);
+    private analytics      = inject(AnalyticsService);
 
     produit: Produit | null = null;
     chargement = true;
@@ -1024,7 +1172,7 @@ export class ProductOverviewComponent implements OnInit {
 
     quantite = 1;
     tailleSelectionnee = '';
-    couleurSelectionnee = 'Blanc';
+    couleurSelectionnee = 'Standard';
     badgesOfficiels = false;
     flocage = false;
     flocageNom = '';
@@ -1038,45 +1186,33 @@ export class ProductOverviewComponent implements OnInit {
 
     ngOnInit(): void {
         const id = Number(this.route.snapshot.paramMap.get('id'));
-        if (!id) {
-            this.chargement = false;
-            this.router.navigate(['/boutique']);
-            return;
-        }
+        if (!id) { this.router.navigate(['/boutique']); return; }
 
         this.produitService.getProduitById(id).subscribe({
             next: (data) => {
                 this.produit = data;
-                this.taillesDisponibles = data.taillesDisponibles?.length ? data.taillesDisponibles : ['S', 'M', 'L', 'XL'];
-                this.couleursDisponibles = data.couleursDisponibles?.length ? data.couleursDisponibles : ['Standard'];
-                this.tailleSelectionnee = this.taillesDisponibles[0];
-                this.couleurSelectionnee = this.couleursDisponibles[0];
+                this.taillesDisponibles    = data.taillesDisponibles?.length  ? data.taillesDisponibles  : ['S', 'M', 'L', 'XL'];
+                this.couleursDisponibles   = data.couleursDisponibles?.length ? data.couleursDisponibles : ['Standard'];
+                this.tailleSelectionnee   = this.taillesDisponibles[0];
+                this.couleurSelectionnee  = this.couleursDisponibles[0];
                 this.chargement = false;
                 this.analytics.trackViewItem({ id: data.id, nom: data.nom, prix: data.prix });
             },
             error: () => {
-                this.messageService.add({
-                    severity: 'warn',
-                    summary: 'Produit introuvable',
-                    detail: 'Ce produit n\'est plus disponible.',
-                    life: 3000
-                });
-                this.router.navigate(['/boutique']);
                 this.chargement = false;
+                this.messageService.add({ severity: 'warn', summary: 'Produit introuvable', detail: 'Ce produit n\'est plus disponible.', life: 3000 });
+                this.router.navigate(['/boutique']);
             }
         });
     }
 
     prixOptionsUnitaire(): number {
-        let total = this.badgesOfficiels ? this.prixBadgesOfficiels : 0;
-        return total + this.prixFlocageTotal();
+        return (this.badgesOfficiels ? this.prixBadgesOfficiels : 0) + this.prixFlocageTotal();
     }
 
     prixFlocageTotal(): number {
         if (!this.flocage) return 0;
-        const nom = (this.flocageNom || '').trim();
-        const numero = (this.flocageNumero || '').trim();
-        return (nom.length + numero.length) * this.prixFlocageParLettre;
+        return ((this.flocageNom || '').trim().length + (this.flocageNumero || '').trim().length) * this.prixFlocageParLettre;
     }
 
     prixTotal(): number {
@@ -1087,36 +1223,25 @@ export class ProductOverviewComponent implements OnInit {
     stockLabel(): string {
         if (!this.produit) return '';
         if (!this.produit.enStock || this.produit.stockTotal <= 0) return 'Rupture';
-        if (this.produit.stockTotal < 8) return `Stock faible`;
+        if (this.produit.stockTotal < 8) return 'Stock faible';
         return 'En stock';
     }
 
     labelCategorie(categorie: string): string {
         const map: Record<string, string> = {
-            'actuel': 'MAILLOT ACTUEL',
-            'vintage-court': 'VINTAGE COURT',
-            'vintage-long': 'VINTAGE LONG',
-            'collection': 'COLLECTION'
+            'actuel': 'MAILLOT ACTUEL', 'vintage-court': 'VINTAGE COURT',
+            'vintage-long': 'VINTAGE LONG', 'collection': 'COLLECTION'
         };
         return map[categorie] ?? 'ÉDITION SPÉCIALE';
     }
 
     ajouterAuPanier(allerPanier = false): void {
         if (!this.produit || !this.tailleSelectionnee || !this.couleurSelectionnee) {
-            this.messageService.add({
-                severity: 'warn',
-                summary: 'Sélection incomplète',
-                detail: 'Veuillez choisir une taille et une couleur.'
-            });
+            this.messageService.add({ severity: 'warn', summary: 'Sélection incomplète', detail: 'Veuillez choisir une taille et une couleur.' });
             return;
         }
-
         if (this.flocage && !this.flocageNom.trim() && !this.flocageNumero.trim()) {
-            this.messageService.add({
-                severity: 'warn',
-                summary: 'Flocage manquant',
-                detail: 'Veuillez saisir un nom ou un numéro de flocage.'
-            });
+            this.messageService.add({ severity: 'warn', summary: 'Flocage manquant', detail: 'Veuillez saisir un nom ou un numéro.' });
             return;
         }
 
@@ -1125,37 +1250,19 @@ export class ProductOverviewComponent implements OnInit {
             couleur: this.couleurSelectionnee,
             badgesOfficiels: this.badgesOfficiels,
             flocage: this.flocage,
-            flocageNom: this.flocage ? this.flocageNom : undefined,
+            flocageNom:    this.flocage ? this.flocageNom    : undefined,
             flocageNumero: this.flocage ? this.flocageNumero : undefined,
-            flocageTexte: this.flocage
-                ? [this.flocageNom, this.flocageNumero].filter(v => v?.trim()).join(' ')
-                : undefined
+            flocageTexte:  this.flocage ? [this.flocageNom, this.flocageNumero].filter(v => v?.trim()).join(' ') : undefined
         };
 
         this.panierService.ajouterAuPanier(this.produit, options, this.quantite, this.prixOptionsUnitaire());
-
-        this.messageService.add({
-            severity: 'success',
-            summary: 'Ajouté au panier',
-            detail: 'Votre maillot a été ajouté avec vos options.'
-        });
-
-        if (allerPanier) this.allerAuPanier();
-    }
-
-    retourBoutique(): void {
-        this.router.navigate(['/boutique']);
-    }
-
-    allerAuPanier(): void {
-        this.router.navigate(['/boutique/panier']);
+        this.messageService.add({ severity: 'success', summary: 'Ajouté au panier', detail: 'Votre maillot a été ajouté avec vos options.' });
+        if (allerPanier) this.router.navigate(['/boutique/panier']);
     }
 
     onImageError(event: Event): void {
         const img = event.target as HTMLImageElement | null;
-        if (img && !img.src.includes(this.fallbackImage)) {
-            img.src = this.fallbackImage;
-        }
+        if (img && !img.src.includes(this.fallbackImage)) img.src = this.fallbackImage;
     }
 
     formatPrix(prix: number): string {

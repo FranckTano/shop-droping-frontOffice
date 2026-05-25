@@ -66,6 +66,12 @@ export class ProduitService {
     );
   }
 
+  rechercherProduits(terme: string): Observable<Produit[]> {
+    return this.http.get<ApiProduit[]>(`${this.apiUrl}/rechercher`, { params: { q: terme } }).pipe(
+      map((items) => (Array.isArray(items) ? items : []).map((item) => this.mapProduit(item)))
+    );
+  }
+
   getProduitById(id: number): Observable<Produit> {
     return this.http.get<ApiProduit>(`${this.apiUrl}/${id}`).pipe(
       map((item) => this.mapProduit(item))

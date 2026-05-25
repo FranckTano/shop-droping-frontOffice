@@ -69,7 +69,7 @@ public class ProduitFacade {
     }
 
     public ProduitDto trouverParId(Long id) {
-        return produitRepository.findByIdWithDetails(id)
+        return produitRepository.findById(id)
             .map(ProduitDto::fromEntity)
             .orElseThrow(() -> new RuntimeException("Produit non trouvé avec l'ID: " + id));
     }

@@ -25,6 +25,12 @@ public class ProduitController {
         return produitFacade.listerTousLesProduits();
     }
 
+    @GetMapping("/rechercher")
+    public List<ProduitDto> rechercher(@RequestParam(defaultValue = "") String q) {
+        if (q.isBlank()) return produitFacade.listerTousLesProduits();
+        return produitFacade.rechercher(q);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ProduitDto> getProduitById(@PathVariable Long id) {
         try {
