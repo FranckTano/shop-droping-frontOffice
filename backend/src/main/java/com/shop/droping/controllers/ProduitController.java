@@ -25,6 +25,26 @@ public class ProduitController {
         return produitFacade.listerTousLesProduits();
     }
 
+    @GetMapping("/categorie/{categorieId}")
+    public List<ProduitDto> getProduitsParCategorie(@PathVariable Long categorieId) {
+        return produitFacade.listerParCategorie(categorieId);
+    }
+
+    @GetMapping("/promotions")
+    public List<ProduitDto> getProduitsEnPromotion() {
+        return produitFacade.listerPromotions();
+    }
+
+    @GetMapping("/nouveautes")
+    public List<ProduitDto> getProduitsNouveautes() {
+        return produitFacade.listerNouveautes();
+    }
+
+    @GetMapping("/recherche")
+    public List<ProduitDto> searchProduits(@RequestParam("terme") String terme) {
+        return produitFacade.rechercher(terme);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ProduitDto> getProduitById(@PathVariable Long id) {
         try {

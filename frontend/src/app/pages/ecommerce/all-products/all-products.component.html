@@ -1,0 +1,64 @@
+<div class="catalog-page">
+    <app-shop-header></app-shop-header>
+
+    <main class="catalog-page__main">
+        <section class="catalog-page__hero">
+            <div class="catalog-page__hero-copy">
+                <p class="catalog-page__eyebrow">Catalogue complet</p>
+                <h1>Tous les articles disponibles</h1>
+                <p>
+                    Explorez les nouveautés, les promotions et les pièces fortes de la boutique. Les informations
+                    affichées proviennent du backend.
+                </p>
+
+                <p class="catalog-page__count">{{ filteredProducts.length }} article(s) trouvés</p>
+            </div>
+
+            <div class="catalog-page__search">
+                <label>
+                    <span>Articles par page</span>
+                    <select [value]="pageSize" (change)="setPageSize($any($event.target).value)">
+                        <option [value]="8">8</option>
+                        <option [value]="12">12</option>
+                        <option [value]="16">16</option>
+                        <option [value]="20">20</option>
+                        <option [value]="24">24</option>
+                    </select>
+                </label>
+
+                <div class="catalog-page__chips">
+                    <button type="button" [class.is-active]="!selectedCategoryId" (click)="clearFilters()">Tout</button>
+                    <button *ngFor="let category of categories" type="button"
+                        [class.is-active]="selectedCategoryId === category.id" (click)="selectCategory(category.id)">
+                        {{ category.name }}
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="catalog-page__content">
+            <div style="width: min(1180px, calc(100% - 2rem)); margin: 0 auto;">
+                <p *ngIf="loading" class="catalog-page__state">Chargement des articles...</p>
+                <p *ngIf="errorMessage" class="catalog-page__state catalog-page__state--error">{{ errorMessage }}</p>
+
+                <ng-container *ngIf="!loading && !errorMessage">
+                    <app-shop-product-carousel
+                        [title]="''"
+                        [showAll]="false"
+                        [products]="filteredProducts"
+                        [pageSize]="pageSize"
+                        (pageSizeChange)="setPageSize($event)"
+                        (productSelected)="openProduct($event)"
+                        (addToCart)="addToCart($event)"
+                        [background]="'transparent'"
+                    ></app-shop-product-carousel>
+                </ng-container>
+            </div>
+        </section>
+    </main>
+
+    <app-shop-footer></app-shop-footer>
+
+    <app-product-detail-modal [visible]="!!selectedProduct" [product]="selectedProduct" (close)="closeProduct()"
+        (addToCart)="addToCart($event)" (buyNow)="buyNow($event)"></app-product-detail-modal>
+</div>

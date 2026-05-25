@@ -1,0 +1,131 @@
+:host {
+    display: block;
+}
+
+.catalog-page {
+    min-height: 100vh;
+    color: var(--app-ink);
+}
+
+.catalog-page__main {
+    margin: 0 auto;
+    padding: 2rem 0 3rem;
+    display: grid;
+    gap: 2rem;
+}
+
+.catalog-page__hero {
+    width: min(1180px, calc(100% - 2rem));
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 1.5rem;
+    padding: 1.5rem;
+}
+
+.catalog-page__hero-copy h1 {
+    margin: 0.35rem 0 0;
+    font-size: clamp(2rem, 4vw, 3.6rem);
+    line-height: 1.05;
+}
+
+.catalog-page__hero-copy p {
+    margin: 0.85rem 0 0;
+    max-width: 36rem;
+    color: var(--app-muted);
+    line-height: 1.8;
+}
+
+.catalog-page__eyebrow {
+    margin: 0;
+    color: var(--app-muted);
+    font-size: small;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+}
+
+.catalog-page__search {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+}
+
+.catalog-page__search label {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.catalog-page__search span {
+    color: var(--app-muted);
+    font-size: small;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.catalog-page__search input {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0 1rem;
+    border: 1px solid var(--app-line);
+    border-radius: 0;
+    background: #ffffff;
+    outline: none;
+}
+
+.catalog-page__search select {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0 1rem;
+    border: 1px solid var(--app-line);
+    border-radius: 0;
+    background: #ffffff;
+    outline: none;
+}
+
+.catalog-page__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.catalog-page__chips button {
+    min-height: 2.65rem;
+    padding: 0.55rem 0.9rem;
+    border: 1px solid var(--app-line);
+    border-radius: 5px;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.catalog-page__chips button.is-active {
+    background: var(--app-ink);
+    color: #ffffff;
+}
+
+.catalog-page__content {
+    width: 100%;
+    background-color: #ffffff;
+    display: grid;
+    gap: 1rem;
+}
+
+.catalog-page__state,
+.catalog-page__count {
+    margin: 0;
+    color: var(--app-muted);
+}
+
+.catalog-page__count {
+    margin-top: 3rem;
+    font-style: italic;
+}
+
+.catalog-page__state--error {
+    color: #b91c1c;
+}
+
+@media (max-width: 900px) {
+    .catalog-page__hero {
+        grid-template-columns: 1fr;
+    }
+}

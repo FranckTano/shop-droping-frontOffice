@@ -1,0 +1,9 @@
+.storefront-page {
+    min-height: 100vh;
+    background: var(--app-surface);
+    color: var(--app-ink);
+}
+
+.storefront-page__main {
+    display: block;
+}

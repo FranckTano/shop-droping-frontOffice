@@ -1,0 +1,54 @@
+<header class="shop-header">
+  <div class="shop-header__inner">
+    <a routerLink="/" class="shop-header__brand" aria-label="Accueil de la boutique">
+      <span class="shop-header__brand-name">ONYX</span>
+    </a>
+
+    <div class="shop-header__actions">
+      <div class="shop-header__search-shell">
+        <form class="shop-header__search" aria-label="Recherche dans la boutique" (ngSubmit)="submitSearch()">
+          <span class="shop-header__search-icon">
+            <img src="assets/search-icon.svg" alt="" />
+          </span>
+          <input
+            #searchInput
+            type="search"
+            name="searchTerm"
+            [value]="searchTerm"
+            placeholder="Rechercher un article..."
+            (input)="onSearchInput($any($event.target).value)"
+            (focus)="onSearchFocus()"
+            (blur)="onSearchBlur()"
+          />
+        </form>
+
+        <div *ngIf="showSearchDropdown" class="shop-header__search-results" role="listbox" aria-label="Résultats de recherche">
+          <button
+            *ngFor="let suggestion of searchResults"
+            type="button"
+            class="shop-header__search-result"
+            (mousedown)="openSuggestion(suggestion, $event)"
+          >
+            <img [src]="suggestion.product.primaryImageUrl" [alt]="suggestion.product.name" />
+            <span class="shop-header__search-result-copy">
+              <strong>{{ suggestion.product.name }}</strong>
+              <span>{{ suggestion.label }}</span>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <a routerLink="/panier" class="shop-header__cart" aria-label="Voir le panier">
+        <img src="assets/basket-icon.svg" alt="" />
+        <span style="padding: 8px 0 4px;">Panier</span>
+        <span *ngIf="cartService.count() > 0" class="shop-header__cart-badge">{{ cartService.count() }}</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="shop-header__meta">
+    <div class="shop-header__meta-inner">
+      <a routerLink="/articles" class="shop-header__meta-link">Tous les articles</a>
+    </div>
+  </div>
+</header>

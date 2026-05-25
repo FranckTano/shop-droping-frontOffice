@@ -1,0 +1,52 @@
+<footer class="shop-footer">
+  <div class="shop-footer__inner">
+    <div class="shop-footer__grid">
+      <div class="shop-footer__brand-block">
+        <a routerLink="/" class="shop-footer__brand">
+          <span class="shop-footer__brand-name">ONYX</span>
+        </a>
+        <p class="shop-footer__brand-copy">Votre boutique en ligne où trouver tous vos maillots préférés.</p>
+        <div class="shop-footer__socials">
+          <span>Instagram</span>
+          <span>Facebook</span>
+          <span>WhatsApp</span>
+        </div>
+      </div>
+
+      <!-- <div *ngFor="let group of footerGroups" class="shop-footer__group">
+        <h3>{{ group.title }}</h3>
+        <ul>
+          <li *ngFor="let link of group.links">
+            <a routerLink="/articles">{{ link }}</a>
+          </li>
+        </ul>
+      </div> -->
+    </div>
+
+    <div class="shop-footer__bottom">
+      <div class="shop-footer__selectors">
+        <label>
+          <span>Pays</span>
+          <select>
+            <option *ngFor="let country of countries">{{ country }}</option>
+          </select>
+        </label>
+        <label>
+          <span>Devise</span>
+          <select>
+            <option *ngFor="let currency of currencies">{{ currency }}</option>
+          </select>
+        </label>
+      </div>
+
+      <p class="shop-footer__copyright">© 2026 ONYX - Côte d’Ivoire</p>
+
+      <div class="shop-footer__payments">
+        <span>WAVE</span>
+        <span>OM</span>
+        <span>MOOV</span>
+        <span>MTN</span>
+      </div>
+    </div>
+  </div>
+</footer>

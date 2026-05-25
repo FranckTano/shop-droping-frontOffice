@@ -1,0 +1,96 @@
+<div class="cart-page">
+    <app-shop-header></app-shop-header>
+
+    <main class="cart-page__main">
+        <section class="cart-page__hero">
+            <p class="cart-page__eyebrow">Panier</p>
+            <h1>Votre panier</h1>
+            <p>Faites une dernière vérification des articles de votre panier et confirmer la commande en cliquant sur le
+                bouton en bas.</p>
+        </section>
+
+        <section *ngIf="cartItems().length; else emptyState" class="cart-page__layout">
+            <div class="cart-page__items">
+                <article *ngFor="let item of cartItems()" class="cart-item">
+                    <img [src]="item.product.primaryImageUrl" [alt]="item.product.name" class="cart-item__image" />
+
+                    <div class="cart-item__content">
+                        <div>
+                            <h2>{{ item.product.name }}</h2>
+                            <p>{{ item.product.categoryName || 'Article' }}</p>
+                        </div>
+
+                        <div class="cart-item__meta">
+                            <span *ngIf="item.size">Taille : {{ item.size }}</span>
+                            <span *ngIf="item.color">Couleur : {{ item.color }}</span>
+                        </div>
+
+                        <div class="cart-item__bottom">
+                            <div class="cart-item__quantity">
+                                <button type="button" (click)="decreaseQuantity(item)">-</button>
+                                <strong>{{ item.quantity }}</strong>
+                                <button type="button" (click)="increaseQuantity(item)">+</button>
+                            </div>
+
+                            <div class="cart-item__summary">
+                                <strong>{{ shopApi.formatMoney(item.lineTotal) }}</strong>
+                                <button type="button" class="cart-item__remove"
+                                    (click)="removeItem(item)">Retirer</button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <aside class="cart-page__summary">
+                <div class="cart-summary-card">
+                    <p class="cart-summary-card__eyebrow">Total</p>
+                    <strong>{{ shopApi.formatMoney(totalAmount()) }}</strong>
+                    <p>Le montant est calculé à partir du prix des articles.</p>
+                </div>
+
+                <form class="checkout-form" [formGroup]="checkoutForm" (ngSubmit)="submitOrder()">
+                    <label>
+                        <span>Nom complet</span>
+                        <input type="text" formControlName="clientNom" />
+                    </label>
+
+                    <label>
+                        <span>Téléphone</span>
+                        <input type="tel" formControlName="clientTelephone" />
+                    </label>
+
+                    <label>
+                        <span>Email</span>
+                        <input type="email" formControlName="clientEmail" />
+                    </label>
+
+                    <label>
+                        <span>Adresse de livraison</span>
+                        <textarea rows="3" formControlName="clientAdresse"></textarea>
+                    </label>
+
+                    <label>
+                        <span>Notes</span>
+                        <textarea rows="3" formControlName="notes"></textarea>
+                    </label>
+
+                    <button type="submit" [disabled]="isSubmitting">Valider la commande</button>
+                </form>
+
+                <p *ngIf="successMessage" class="cart-page__notice cart-page__notice--success">{{ successMessage }}</p>
+                <p *ngIf="errorMessage" class="cart-page__notice cart-page__notice--error">{{ errorMessage }}</p>
+            </aside>
+        </section>
+
+        <ng-template #emptyState>
+            <section class="cart-page__empty">
+                <h2>Votre panier est vide</h2>
+                <p>Ajoutez un article pour commencer votre sélection.</p>
+                <a routerLink="/articles" class="cart-page__empty-link">Découvrir les articles</a>
+            </section>
+        </ng-template>
+    </main>
+
+    <app-shop-footer></app-shop-footer>
+</div>

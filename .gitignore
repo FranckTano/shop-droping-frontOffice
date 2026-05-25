@@ -9,6 +9,8 @@ backend/src/main/generated/
 frontend/.angular
 frontend/node_modules
 frontend/.vscode
+frontend/.angular/
+frontend/build-*.txt
 frontend/dist/
 ### STS ###
 backend/.apt_generated

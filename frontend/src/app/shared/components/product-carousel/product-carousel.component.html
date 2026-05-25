@@ -1,0 +1,60 @@
+<section class="product-section" [ngStyle]="{ 'background': background ?? 'var(--app-surface)' }">
+  <div class="product-section__inner">
+    <div class="product-section__header">
+      <h2 class="section-label">{{ title }}</h2>
+      <div class="product-section__tools">
+        <label class="product-section__page-size" *ngIf="showPageSizeSelector">
+          <span>Articles par page</span>
+          <select [value]="pageSize" (change)="setPageSize($any($event.target).value)">
+            <option *ngFor="let option of pageSizeOptions" [value]="option">{{ option }}</option>
+          </select>
+        </label>
+        <a *ngIf="showAll" [routerLink]="showAllLink" class="product-section__show-all">Voir tout</a>
+        <p *ngIf="pagination && pageCount > 1" class="product-section__pagination-text">Page {{ currentPage }} sur {{
+          pageCount }}</p>
+        <div class="product-section__controls" *ngIf="pagination && pageCount > 1">
+          <button
+            type="button"
+            [disabled]="!canGoPrevious"
+            [class.active]="canGoPrevious"
+            (click)="previousPage()"
+            aria-label="Previous products"
+          >
+            <img src="assets/arrow-left.svg" alt="arrow icon" width="24" />
+          </button>
+          <button
+            type="button"
+            [disabled]="!canGoNext"
+            [class.active]="canGoNext"
+            (click)="nextPage()"
+            aria-label="Next products"
+          >
+            <img src="assets/right-arrow.svg" alt="arrow icon" width="24" />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-grid">
+      <article *ngFor="let product of visibleProducts; trackBy: trackById" class="product-card">
+        <button type="button" class="product-card__surface" (click)="selectProduct(product)">
+          <div class="product-card__media">
+            <img [src]="product.primaryImageUrl" [alt]="product.name" class="product-card__image" />
+            <span *ngIf="product.onSale" class="product-card__badge" data-badge="SALE">Promo</span>
+            <span *ngIf="product.isNew" class="product-card__badge" data-badge="NEW">Nouveau</span>
+          </div>
+        </button>
+        <div style="display: flex; gap: 10px; justify-content: space-between; align-items: center;">
+          <div style="display: flex; flex-direction: column; flex: 2; gap: 5px">
+            <h3 class="product-card__name">{{ product.name }}</h3>
+            <p class="product-card__price">{{ product.effectivePrice | number:'1.0-0' }} FCFA</p>
+          </div>
+          <div class="product-card__actions" style="flex: 1">
+            <button type="button" class="product-card__quick-add" (click)="quickAdd(product, $event)">Ajouter</button>
+          </div>
+        </div>
+      </article>
+    </div>
+
+  </div>
+</section>

@@ -1,12 +1,31 @@
-<div class="min-h-screen bg-white text-gray-900">
+<div class="storefront-page">
   <app-shop-header></app-shop-header>
-  <main>
+  <main class="storefront-page__main">
     <app-shop-hero></app-shop-hero>
-    <app-shop-categories></app-shop-categories>
-    <app-shop-product-carousel [title]="mensTitle" [products]="mensProducts"></app-shop-product-carousel>
-    <app-shop-product-carousel [title]="toteTitle" [products]="toteProducts"></app-shop-product-carousel>
+    <!-- <app-shop-categories [categories]="categories"></app-shop-categories> -->
+     <p *ngIf="loading" class="storefront-page__status">Chargement des articles...</p>
+     <p *ngIf="errorMessage" class="storefront-page__status storefront-page__status--error">{{ errorMessage }}</p>
+     <ng-container *ngIf="!loading && !errorMessage">
+       <app-shop-product-carousel
+         [title]="featuredTitle"
+         [products]="featuredProducts"
+         [showAllLink]="'/articles'"
+         (productSelected)="openProduct($event)"
+         (addToCart)="addToCart($event)"
+         [showPageSizeSelector]="false"
+       ></app-shop-product-carousel>
+       <!-- Additional carousels intentionally removed to keep storefront focused. -->
+    </ng-container>
     <app-black-land-banner></app-black-land-banner>
     <app-newsletter></app-newsletter>
   </main>
   <app-shop-footer></app-shop-footer>
+
+  <app-product-detail-modal
+    [visible]="!!selectedProduct"
+    [product]="selectedProduct"
+    (close)="closeProduct()"
+    (addToCart)="addToCart($event)"
+    (buyNow)="buyNow($event)"
+  ></app-product-detail-modal>
 </div>

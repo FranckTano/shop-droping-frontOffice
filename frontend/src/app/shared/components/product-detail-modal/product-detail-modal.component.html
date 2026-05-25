@@ -1,0 +1,73 @@
+<div *ngIf="visible && product" class="product-modal" role="dialog" aria-modal="true" [attr.aria-label]="product.name">
+  <button type="button" class="product-modal__backdrop" aria-label="Fermer le détail" (click)="closeModal()"></button>
+
+  <section class="product-modal__panel">
+    <button type="button" class="product-modal__close" aria-label="Fermer" (click)="closeModal()">×</button>
+
+    <div class="product-modal__media">
+      <img [src]="product.primaryImageUrl" [alt]="product.name" />
+      <span *ngIf="product.onSale" class="product-modal__tag product-modal__tag--sale">Promo</span>
+      <span *ngIf="product.isNew" class="product-modal__tag">Nouveau</span>
+    </div>
+
+    <div class="product-modal__content">
+      <p class="product-modal__eyebrow">{{ product.categoryName || 'Article' }}</p>
+      <h3>{{ product.name }}</h3>
+      <p class="product-modal__description">{{ product.description }}</p>
+
+      <div class="product-modal__pricing">
+        <strong>{{ shopApi.formatMoney(product.effectivePrice) }}</strong>
+        <span *ngIf="product.salePrice !== null" class="product-modal__old-price">{{ shopApi.formatMoney(product.price) }}</span>
+      </div>
+
+      <div *ngIf="product.sizes.length" class="product-modal__section">
+        <span class="product-modal__label">Taille</span>
+        <div class="product-modal__choices">
+          <button
+            *ngFor="let size of product.sizes"
+            type="button"
+            class="product-modal__choice"
+            [class.is-active]="selectedSize === size.size"
+            [disabled]="!size.inStock"
+            (click)="chooseSize(size.size)"
+          >
+            {{ size.size }}
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="product.colors.length" class="product-modal__section">
+        <span class="product-modal__label">Couleur</span>
+        <div class="product-modal__choices">
+          <button
+            *ngFor="let color of product.colors"
+            type="button"
+            class="product-modal__choice"
+            [class.is-active]="selectedColor === color"
+            (click)="chooseColor(color)"
+          >
+            {{ color }}
+          </button>
+        </div>
+      </div>
+
+      <div class="product-modal__quantity">
+        <span class="product-modal__label">Quantité</span>
+        <div class="product-modal__stepper">
+          <button type="button" (click)="decreaseQuantity()">-</button>
+          <strong>{{ quantity }}</strong>
+          <button type="button" (click)="increaseQuantity()">+</button>
+        </div>
+      </div>
+
+      <p class="product-modal__stock">
+        {{ product.inStock ? 'Disponible' : 'Rupture momentanée' }}
+      </p>
+
+      <div class="product-modal__actions">
+        <button type="button" class="product-modal__button product-modal__button--primary" (click)="emitAddToCart()">Ajouter au panier</button>
+        <button type="button" class="product-modal__button product-modal__button--secondary" (click)="emitBuyNow()">Acheter maintenant</button>
+      </div>
+    </div>
+  </section>
+</div>

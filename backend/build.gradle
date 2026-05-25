@@ -204,3 +204,9 @@ sonar {
 bootWar {
 	archiveFileName = 'radee-trading.war'
 }
+
+tasks.register('runBoot') {
+	group = 'application'
+	description = 'Runs the Spring Boot application using bootRun.'
+	dependsOn tasks.named('bootRun')
+}

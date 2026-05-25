@@ -6,9 +6,15 @@ import { RouterOutlet } from '@angular/router';
   standalone: true,
   imports: [RouterOutlet],
   template: `
-    <div class="min-h-screen bg-slate-50 text-slate-900">
+    <div class="app-shell">
       <router-outlet></router-outlet>
     </div>
   `,
+  styles: [`
+    .app-shell {
+      min-height: 100vh;
+      color: var(--app-ink);
+    }
+  `],
 })
 export class AppComponent {}

@@ -1,0 +1,26 @@
+<section id="collections" class="categories">
+  <div class="categories__inner">
+    <div class="categories__header">
+      <h2 class="section-label">Catégories à découvrir</h2>
+      <div class="categories__controls">
+        <button type="button" aria-label="Previous category">
+          <img src="assets/arrow-left.svg" alt="arrow icon" width="24"/>
+        </button>
+        <button type="button" aria-label="Next category" class="active">
+          <img src="assets/right-arrow.svg" alt="arrow icon" width="24"/>
+        </button>
+      </div>
+    </div>
+
+    <div class="categories__grid">
+      <div *ngFor="let category of categories">
+        <a [routerLink]="['/articles']" [queryParams]="{ categorie: category.id }" class="category-card">
+          <img [src]="category.imageUrl || 'assets/images/storefront/categories/men-category.jpg'" [alt]="category.name" class="category-card__image" />
+          <span class="category-card__shade"></span>
+        </a>
+        <h3 class="category-card__title">{{ category.name }}</h3>
+        <p class="category-card__copy">{{ category.productCount || 0 }} article(s)</p>
+      </div>
+    </div>
+  </div>
+</section>
