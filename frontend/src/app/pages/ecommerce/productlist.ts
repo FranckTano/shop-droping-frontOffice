@@ -154,6 +154,16 @@ type VueMode = 'grid-classic' | 'grid-premium' | 'masonry' | 'list' | 'mini' | '
                         {{ onglet.label }}
                         <span class="pl-filter-btn__count" *ngIf="onglet.id !== 'tous'">({{ countByTab(onglet.id) }})</span>
                     </button>
+
+                    <div class="pl-toolbar__page-size">
+                        <span class="pl-toolbar__page-size-label">Par page</span>
+                        <select
+                            class="pl-toolbar__page-size-select"
+                            [ngModel]="rowsPerPage"
+                            (ngModelChange)="onRowsPerPageChange($event)">
+                            <option *ngFor="let option of rowsPerPageOptions" [ngValue]="option">{{ option }}</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="pl-toolbar__actions">
@@ -498,7 +508,6 @@ type VueMode = 'grid-classic' | 'grid-premium' | 'masonry' | 'list' | 'mini' | '
                     <p-paginator
                         [rows]="rowsPerPage"
                         [totalRecords]="produitsFiltres.length"
-                        [rowsPerPageOptions]="[8, 12, 16, 24]"
                         (onPageChange)="onPageChange($event)"
                         styleClass="pl-paginator">
                     </p-paginator>
@@ -806,6 +815,25 @@ type VueMode = 'grid-classic' | 'grid-premium' | 'masonry' | 'list' | 'mini' | '
         }
         .pl-toolbar__filters {
             display: flex; gap: 0.4rem; flex-wrap: wrap; flex: 1;
+        }
+        .pl-toolbar__page-size {
+            display: flex; align-items: center; gap: 0.5rem;
+            padding-left: 0.35rem; margin-left: 0.35rem;
+            border-left: 1px solid #e5ddd3;
+        }
+        .pl-toolbar__page-size-label {
+            color: #7d7268; font-size: 0.75rem; font-weight: 600;
+            white-space: nowrap; letter-spacing: 0.02em;
+        }
+        .pl-toolbar__page-size-select {
+            min-width: 55px; padding: 0.42rem 0.7rem;
+            background: #ffffff; border: 1.5px solid #ddd8d0;
+            border-radius: 0.9rem; color: #444; font-size: 0.78rem;
+            font-family: 'Poppins', sans-serif; outline: none;
+            transition: border-color 0.2s ease, color 0.2s ease;
+        }
+        .pl-toolbar__page-size-select:focus {
+            border-color: #FF4500; color: #1a1a1a;
         }
         .pl-toolbar__actions {
             display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0;
@@ -1353,6 +1381,7 @@ export class ProductListComponent implements OnInit {
     private readonly fallbackImage = '/images/app/login.png';
 
     rowsPerPage = 12;
+    rowsPerPageOptions = [8, 12, 16, 24];
     currentPage = 0;
 
     ongletActif: OngletId = 'tous';
@@ -1514,6 +1543,12 @@ export class ProductListComponent implements OnInit {
         this.currentPage = event.page ?? 0;
         this.rowsPerPage = event.rows ?? this.rowsPerPage;
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    onRowsPerPageChange(rows: number): void {
+        this.rowsPerPage = rows;
+        this.currentPage = 0;
+        // window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     onImageError(event: Event): void {
