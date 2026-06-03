@@ -1,5 +1,6 @@
+// Remplacez par l'URL exacte de votre service Render (frontOffice backend)
 export const environment = {
-	production: true,
-	apiUrl: 'https://VOTRE_URL_DE_PROD/api', // TODO: Mettre à jour avec votre URL de production
-	url: 'https://VOTRE_URL_DE_PROD'
+    production: true,
+    apiUrl: 'https://VOTRE_FRONTOFFICE_BACKEND.onrender.com/api',
+    url: 'https://VOTRE_FRONTOFFICE.vercel.app'
 };
