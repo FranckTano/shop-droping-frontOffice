@@ -11,7 +11,7 @@ export const apiInterceptor: HttpInterceptorFn = (req, next) => {
 
 
 	const isAbsoluteUrl = (url: string) => {
-		const absolutePattern = /^http?:\/\//i;
+		const absolutePattern = /^https?:\/\//i;
 		return absolutePattern.test(url);
 	};
 
