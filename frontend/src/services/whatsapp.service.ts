@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WhatsappService {
-  private readonly numeroVendeur  = '+2250799136306';
-  private readonly backofficeUrl   = 'http://localhost:4400';
-  private readonly frontofficeUrl  = 'http://localhost:3000';
+  private readonly numeroVendeur = '+2250799136306';
+  private readonly backofficeUrl = environment.backOfficeUrl;
+  private readonly frontofficeUrl = environment.url;
 
   creerMessageCommande(commande: any, commandeId: number, commandeNumero?: string): string {
     const ref = commandeNumero ? `N° ${commandeNumero}` : `#${commandeId}`;
-    let message = `🛒 *NOUVELLE COMMANDE ${ref} - Shop Droping*\n\n`;
+    let message = `🛒 *NOUVELLE COMMANDE ${ref} - MOMOStore*\n\n`;
     message += `👤 *Client:* ${commande.nomClient}\n`;
     message += `📱 *Téléphone:* ${commande.telephoneClient}\n`;
     message += `📍 *Adresse:* ${commande.adresseClient}\n`;
@@ -54,7 +55,7 @@ export class WhatsappService {
 
   creerMessageMobileMoney(commande: any, commandeId: number, commandeNumero?: string): string {
     const ref = commandeNumero ? `N° ${commandeNumero}` : `#${commandeId}`;
-    let message = `💳 *PAIEMENT MOBILE MONEY - MOMO Shop*\n`;
+    let message = `💳 *PAIEMENT MOBILE MONEY - MOMOStore*\n`;
     message += `Commande ${ref}\n\n`;
     message += `👤 *Client:* ${commande.nomClient}\n`;
     message += `📱 *Téléphone:* ${commande.telephoneClient}\n`;
@@ -84,8 +85,8 @@ export class WhatsappService {
 
   envoyerMessage(message: string): void {
     const encodedMessage = encodeURIComponent(message);
-    const cleanNumero    = this.numeroVendeur.replace(/[^0-9]/g, '');
-    const lienWhatsApp   = `https://wa.me/${cleanNumero}?text=${encodedMessage}`;
+    const cleanNumero = this.numeroVendeur.replace(/[^0-9]/g, '');
+    const lienWhatsApp = `https://wa.me/${cleanNumero}?text=${encodedMessage}`;
     window.open(lienWhatsApp, '_blank');
   }
 

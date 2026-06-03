@@ -84,7 +84,7 @@ interface InfosClient {
 
                     <!-- LEFT: ITEMS -->
                     <div class="sc-items">
-                        <div *ngFor="let article of panierService.articles(); let i = index"
+                        <div *ngFor="let article of panierService.articles(); let i = index; trackBy: trackByArticleId"
                              class="sc-item"
                              [class.sc-item--bordered]="i > 0">
 
@@ -1351,6 +1351,10 @@ export class ShoppingCartComponent implements OnInit {
 
     formatPrix(prix: number): string {
         return new Intl.NumberFormat('fr-FR').format(prix);
+    }
+
+    trackByArticleId(_index: number, article: ArticlePanier): string {
+        return article.id;
     }
 
     prixUnitaire(article: ArticlePanier): number {

@@ -144,9 +144,7 @@ export class PanierService {
 
   mettreAJourOptions(articleId: string, options: OptionsMaillot, prixOptionsUnitaire: number): void {
     const oldArticle = this.getArticle(articleId);
-    if (!oldArticle) {
-      return;
-    }
+    if (!oldArticle) return;
 
     const cleanedOptions: OptionsMaillot = {
       ...options,
@@ -155,32 +153,16 @@ export class PanierService {
       flocageTexte: options.flocageTexte?.trim() ?? ''
     };
 
-    const newOptionsKey = this.getOptionsKey(cleanedOptions);
-    const newArticleId = this.getArticleId(oldArticle.produit.id, newOptionsKey);
+    // Mise à jour en place — on conserve le même ID pour éviter la
+    // destruction/recréation DOM qui fait perdre le focus et réinitialise les états
+    const articles = this.articlesSignal().map(item => {
+      if (item.id === articleId) {
+        return { ...item, options: cleanedOptions, prixOptionsUnitaire };
+      }
+      return item;
+    });
 
-    const remaining = this.articlesSignal().filter(item => item.id !== articleId);
-    const duplicateIndex = remaining.findIndex(item => item.id === newArticleId);
-
-    if (duplicateIndex > -1) {
-      const duplicate = remaining[duplicateIndex];
-      remaining[duplicateIndex] = {
-        ...duplicate,
-        quantite: duplicate.quantite + oldArticle.quantite,
-        prixOptionsUnitaire
-      };
-      this.articlesSignal.set(remaining);
-      this.sauvegarderDansLocalStorage();
-      return;
-    }
-
-    this.articlesSignal.set(
-      remaining.concat({
-        ...oldArticle,
-        id: newArticleId,
-        options: cleanedOptions,
-        prixOptionsUnitaire
-      })
-    );
+    this.articlesSignal.set(articles);
     this.sauvegarderDansLocalStorage();
   }
 

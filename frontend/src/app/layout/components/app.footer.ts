@@ -15,11 +15,11 @@ import {NgClass} from "@angular/common";
 				'text-white': layoutService.isDarkTheme(),
 				'text-primary': !layoutService.isDarkTheme()
 			}">
-				{{ layoutService.isSlimPlus() ? 'SD' : 'Shop Droping' }}
+				{{ layoutService.isSlimPlus() ? 'MS' : 'MOMOStore' }}
 			</span>
 		</div>
 		<div class="flex gap-0 items-center">
-			<small class="text-muted-color">&copy; {{ annee }} Shop Droping. Tous droits réservés.</small>
+			<small class="text-muted-color">&copy; {{ annee }} MOMOStore. Tous droits réservés.</small>
 		</div>`,
 	host: {
 		class: 'layout-footer'
