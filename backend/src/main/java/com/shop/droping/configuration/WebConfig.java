@@ -1,6 +1,5 @@
 package com.shop.droping.configuration;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -10,9 +9,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     private final WebProperties webProperties;
-
-    @Value("${file.product.image-path}")
-    private String productImagePath;
 
     public WebConfig(WebProperties webProperties) {
         this.webProperties = webProperties;
@@ -31,25 +27,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        boolean isWindows = System.getProperty("os.name", "").startsWith("Windows");
-
-        // Fichiers uploadés (produits)
-        String productImageLocation = isWindows
-                ? "file:///" + productImagePath.replace("\\", "/") + "/"
-                : "file:" + productImagePath + "/";
-
-        registry.addResourceHandler("/uploads/produits/**")
-                .addResourceLocations(productImageLocation);
-
-        // Fichiers génériques
-        String fileUploadLocation = isWindows
-                ? "file:///" + webProperties.getFileUploadBasePath().replace("\\", "/") + "/"
-                : "file:" + webProperties.getFileUploadBasePath() + "/";
-
-        registry.addResourceHandler("/fichiers/**")
-                .addResourceLocations(fileUploadLocation);
-
-        // Images statiques du classpath (catalogue auto-généré)
+        // Images statiques du classpath (catalogue initial — servies depuis le JAR)
         registry.addResourceHandler("/assets/images/**")
                 .addResourceLocations("classpath:/images/");
 
