@@ -83,11 +83,14 @@ export class WhatsappService {
     return message;
   }
 
-  envoyerMessage(message: string): void {
+  construireLien(message: string): string {
     const encodedMessage = encodeURIComponent(message);
     const cleanNumero = this.numeroVendeur.replace(/[^0-9]/g, '');
-    const lienWhatsApp = `https://wa.me/${cleanNumero}?text=${encodedMessage}`;
-    window.open(lienWhatsApp, '_blank');
+    return `https://wa.me/${cleanNumero}?text=${encodedMessage}`;
+  }
+
+  envoyerMessage(message: string): void {
+    window.location.href = this.construireLien(message);
   }
 
   private formatPrix(prix: number): string {

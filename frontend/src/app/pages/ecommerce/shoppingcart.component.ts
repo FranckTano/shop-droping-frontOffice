@@ -1253,6 +1253,10 @@ export class ShoppingCartComponent implements OnInit {
         const articles = this.panierService.articles();
         const montantTotal = this.panierService.montantTotal();
 
+        // Ouvrir la fenêtre WhatsApp MAINTENANT (geste synchrone = jamais bloqué sur iOS Safari)
+        // Sur mobile : window.location sera mis à jour vers le lien wa.me après la réponse API
+        const waWindow = window.open('', '_blank');
+
         const commande = {
             clientNom: this.infosClient.nom,
             clientTelephone: this.infosClient.telephone,
@@ -1277,7 +1281,6 @@ export class ShoppingCartComponent implements OnInit {
                 this.panierService.viderPanier();
 
                 if (this.modePaiement === 'mobilemoney') {
-                    // Mode Mobile Money : envoyer message WhatsApp avec instructions de paiement
                     const message = this.whatsappService.creerMessageMobileMoney(
                         {
                             nomClient: this.infosClient.nom,
@@ -1295,7 +1298,8 @@ export class ShoppingCartComponent implements OnInit {
                         res.id,
                         res.numero
                     );
-                    this.whatsappService.envoyerMessage(message);
+                    const lien = this.whatsappService.construireLien(message);
+                    if (waWindow) { waWindow.location.href = lien; } else { window.location.href = lien; }
                     this.messageService.add({
                         severity: 'success',
                         summary: 'Commande créée ✓',
@@ -1306,7 +1310,6 @@ export class ShoppingCartComponent implements OnInit {
                         this.router.navigate(['/boutique/ma-commande'], { queryParams: { numero: res.numero } });
                     }, 1500);
                 } else {
-                    // Mode WhatsApp
                     const message = this.whatsappService.creerMessageCommande(
                         {
                             nomClient: this.infosClient.nom,
@@ -1326,7 +1329,8 @@ export class ShoppingCartComponent implements OnInit {
                         res.id,
                         res.numero
                     );
-                    this.whatsappService.envoyerMessage(message);
+                    const lien = this.whatsappService.construireLien(message);
+                    if (waWindow) { waWindow.location.href = lien; } else { window.location.href = lien; }
                     this.messageService.add({
                         severity: 'success',
                         summary: 'Commande envoyée ✓',
@@ -1339,6 +1343,7 @@ export class ShoppingCartComponent implements OnInit {
                 }
             },
             error: () => {
+                if (waWindow) waWindow.close();
                 this.messageService.add({
                     severity: 'error',
                     summary: 'Erreur',
