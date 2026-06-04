@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +15,7 @@ import static io.swagger.v3.oas.annotations.enums.SecuritySchemeIn.HEADER;
 import static io.swagger.v3.oas.annotations.enums.SecuritySchemeType.APIKEY;
 
 @SpringBootApplication
+@EnableScheduling
 @SecurityScheme(
         name = "Authorization",
         scheme = "bearer",
