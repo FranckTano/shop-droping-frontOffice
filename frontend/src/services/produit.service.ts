@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, map, shareReplay } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 // Correspond au modèle Produit du backend
@@ -58,12 +58,17 @@ export class ProduitService {
   private readonly apiBaseUrl = environment.apiUrl.replace(/\/api$/, '');
   private readonly imagePlaceholder = '/images/app/login.png';
 
-  constructor(private http: HttpClient) { }
+  private readonly produitsCache$: Observable<Produit[]>;
+
+  constructor(private http: HttpClient) {
+    this.produitsCache$ = this.http.get<ApiProduit[]>(this.apiUrl).pipe(
+      map((items) => (Array.isArray(items) ? items : []).map((item) => this.mapProduit(item))),
+      shareReplay(1)
+    );
+  }
 
   getProduits(): Observable<Produit[]> {
-    return this.http.get<ApiProduit[]>(this.apiUrl).pipe(
-      map((items) => (Array.isArray(items) ? items : []).map((item) => this.mapProduit(item)))
-    );
+    return this.produitsCache$;
   }
 
   rechercherProduits(terme: string): Observable<Produit[]> {
