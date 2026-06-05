@@ -302,15 +302,12 @@ interface Pays {
                             [(ngModel)]="paysSelectionne"
                             optionLabel="label"
                             [filter]="true"
-                            filterBy="nom,indicatif"
+                            filterBy="nom,label"
                             appendTo="body"
                             styleClass="sc-pays-select"
-                            placeholder="Pays">
-                            <ng-template pTemplate="selectedItem" let-p>
-                                <span class="sc-pays-option">{{ p?.drapeau }} {{ p?.indicatif }}</span>
-                            </ng-template>
+                            placeholder="🌍 Pays">
                             <ng-template pTemplate="item" let-p>
-                                <span class="sc-pays-option">{{ p?.drapeau }} {{ p?.nom }} ({{ p?.indicatif }})</span>
+                                <span class="sc-pays-option">{{ p.drapeau }} {{ p.nom }} ({{ p.indicatif }})</span>
                             </ng-template>
                         </p-select>
                         <input pInputText
@@ -1299,27 +1296,27 @@ export class ShoppingCartComponent implements OnInit {
     telephoneErreur = '';
 
     readonly paysList = [
-        { code: 'CI', nom: 'Côte d\'Ivoire', indicatif: '+225', drapeau: '🇨🇮', longueurMin: 8, longueurMax: 10 },
-        { code: 'SN', nom: 'Sénégal',        indicatif: '+221', drapeau: '🇸🇳', longueurMin: 9, longueurMax: 9  },
-        { code: 'ML', nom: 'Mali',            indicatif: '+223', drapeau: '🇲🇱', longueurMin: 8, longueurMax: 8  },
-        { code: 'BF', nom: 'Burkina Faso',    indicatif: '+226', drapeau: '🇧🇫', longueurMin: 8, longueurMax: 8  },
-        { code: 'GN', nom: 'Guinée',          indicatif: '+224', drapeau: '🇬🇳', longueurMin: 9, longueurMax: 9  },
-        { code: 'TG', nom: 'Togo',            indicatif: '+228', drapeau: '🇹🇬', longueurMin: 8, longueurMax: 8  },
-        { code: 'BJ', nom: 'Bénin',           indicatif: '+229', drapeau: '🇧🇯', longueurMin: 8, longueurMax: 8  },
-        { code: 'GH', nom: 'Ghana',           indicatif: '+233', drapeau: '🇬🇭', longueurMin: 9, longueurMax: 9  },
-        { code: 'NG', nom: 'Nigeria',         indicatif: '+234', drapeau: '🇳🇬', longueurMin: 10, longueurMax: 10 },
-        { code: 'CM', nom: 'Cameroun',        indicatif: '+237', drapeau: '🇨🇲', longueurMin: 9, longueurMax: 9  },
-        { code: 'GA', nom: 'Gabon',           indicatif: '+241', drapeau: '🇬🇦', longueurMin: 7, longueurMax: 8  },
-        { code: 'CG', nom: 'Congo',           indicatif: '+242', drapeau: '🇨🇬', longueurMin: 9, longueurMax: 9  },
-        { code: 'CD', nom: 'RD Congo',        indicatif: '+243', drapeau: '🇨🇩', longueurMin: 9, longueurMax: 9  },
-        { code: 'MR', nom: 'Mauritanie',      indicatif: '+222', drapeau: '🇲🇷', longueurMin: 8, longueurMax: 8  },
-        { code: 'FR', nom: 'France',          indicatif: '+33',  drapeau: '🇫🇷', longueurMin: 9, longueurMax: 9  },
-        { code: 'BE', nom: 'Belgique',        indicatif: '+32',  drapeau: '🇧🇪', longueurMin: 8, longueurMax: 9  },
-        { code: 'MA', nom: 'Maroc',           indicatif: '+212', drapeau: '🇲🇦', longueurMin: 9, longueurMax: 9  },
-        { code: 'DZ', nom: 'Algérie',         indicatif: '+213', drapeau: '🇩🇿', longueurMin: 9, longueurMax: 9  },
-        { code: 'TN', nom: 'Tunisie',         indicatif: '+216', drapeau: '🇹🇳', longueurMin: 8, longueurMax: 8  },
-        { code: 'US', nom: 'États-Unis',      indicatif: '+1',   drapeau: '🇺🇸', longueurMin: 10, longueurMax: 10 },
-        { code: 'CA', nom: 'Canada',          indicatif: '+1',   drapeau: '🇨🇦', longueurMin: 10, longueurMax: 10 },
+        { code: 'CI', nom: 'Côte d\'Ivoire', indicatif: '+225', drapeau: '🇨🇮', label: '🇨🇮 +225', longueurMin: 8, longueurMax: 10 },
+        { code: 'SN', nom: 'Sénégal',        indicatif: '+221', drapeau: '🇸🇳', label: '🇸🇳 +221', longueurMin: 9, longueurMax: 9  },
+        { code: 'ML', nom: 'Mali',            indicatif: '+223', drapeau: '🇲🇱', label: '🇲🇱 +223', longueurMin: 8, longueurMax: 8  },
+        { code: 'BF', nom: 'Burkina Faso',    indicatif: '+226', drapeau: '🇧🇫', label: '🇧🇫 +226', longueurMin: 8, longueurMax: 8  },
+        { code: 'GN', nom: 'Guinée',          indicatif: '+224', drapeau: '🇬🇳', label: '🇬🇳 +224', longueurMin: 9, longueurMax: 9  },
+        { code: 'TG', nom: 'Togo',            indicatif: '+228', drapeau: '🇹🇬', label: '🇹🇬 +228', longueurMin: 8, longueurMax: 8  },
+        { code: 'BJ', nom: 'Bénin',           indicatif: '+229', drapeau: '🇧🇯', label: '🇧🇯 +229', longueurMin: 8, longueurMax: 8  },
+        { code: 'GH', nom: 'Ghana',           indicatif: '+233', drapeau: '🇬🇭', label: '🇬🇭 +233', longueurMin: 9, longueurMax: 9  },
+        { code: 'NG', nom: 'Nigeria',         indicatif: '+234', drapeau: '🇳🇬', label: '🇳🇬 +234', longueurMin: 10, longueurMax: 10 },
+        { code: 'CM', nom: 'Cameroun',        indicatif: '+237', drapeau: '🇨🇲', label: '🇨🇲 +237', longueurMin: 9, longueurMax: 9  },
+        { code: 'GA', nom: 'Gabon',           indicatif: '+241', drapeau: '🇬🇦', label: '🇬🇦 +241', longueurMin: 7, longueurMax: 8  },
+        { code: 'CG', nom: 'Congo',           indicatif: '+242', drapeau: '🇨🇬', label: '🇨🇬 +242', longueurMin: 9, longueurMax: 9  },
+        { code: 'CD', nom: 'RD Congo',        indicatif: '+243', drapeau: '🇨🇩', label: '🇨🇩 +243', longueurMin: 9, longueurMax: 9  },
+        { code: 'MR', nom: 'Mauritanie',      indicatif: '+222', drapeau: '🇲🇷', label: '🇲🇷 +222', longueurMin: 8, longueurMax: 8  },
+        { code: 'FR', nom: 'France',          indicatif: '+33',  drapeau: '🇫🇷', label: '🇫🇷 +33',  longueurMin: 9, longueurMax: 9  },
+        { code: 'BE', nom: 'Belgique',        indicatif: '+32',  drapeau: '🇧🇪', label: '🇧🇪 +32',  longueurMin: 8, longueurMax: 9  },
+        { code: 'MA', nom: 'Maroc',           indicatif: '+212', drapeau: '🇲🇦', label: '🇲🇦 +212', longueurMin: 9, longueurMax: 9  },
+        { code: 'DZ', nom: 'Algérie',         indicatif: '+213', drapeau: '🇩🇿', label: '🇩🇿 +213', longueurMin: 9, longueurMax: 9  },
+        { code: 'TN', nom: 'Tunisie',         indicatif: '+216', drapeau: '🇹🇳', label: '🇹🇳 +216', longueurMin: 8, longueurMax: 8  },
+        { code: 'US', nom: 'États-Unis',      indicatif: '+1',   drapeau: '🇺🇸', label: '🇺🇸 +1',   longueurMin: 10, longueurMax: 10 },
+        { code: 'CA', nom: 'Canada',          indicatif: '+1',   drapeau: '🇨🇦', label: '🇨🇦 +1',   longueurMin: 10, longueurMax: 10 },
     ];
 
     paysSelectionne = this.paysList[0]; // Côte d'Ivoire par défaut
