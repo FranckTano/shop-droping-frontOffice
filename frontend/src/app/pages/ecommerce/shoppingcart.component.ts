@@ -11,6 +11,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { CheckboxModule } from 'primeng/checkbox';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { SelectModule } from 'primeng/select';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { PanierService, ArticlePanier } from '@services/panier.service';
@@ -21,10 +22,20 @@ import { AdresseMapComponent, AdresseInfo } from './adresse-map.component';
 
 interface InfosClient {
     nom: string;
+    indicatif: string;
     telephone: string;
     adresse: string;
     lienGps: string;
     notes: string;
+    numeroWhatsappConfirme: boolean;
+}
+
+interface Pays {
+    code: string;
+    nom: string;
+    indicatif: string;
+    longueurMin: number;
+    longueurMax: number;
 }
 
 @Component({
@@ -33,7 +44,8 @@ interface InfosClient {
     imports: [
         CommonModule, FormsModule, ButtonModule, RippleModule, DividerModule,
         ConfirmDialogModule, DialogModule, InputTextModule, TextareaModule,
-        CheckboxModule, MultiSelectModule, ToastModule, AdresseMapComponent
+        CheckboxModule, MultiSelectModule, ToastModule, AdresseMapComponent,
+        SelectModule
     ],
     providers: [ConfirmationService, MessageService],
     template: `
@@ -284,7 +296,52 @@ interface InfosClient {
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .99h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.91 8.1a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14.92v3z"/></svg>
                         Numéro WhatsApp *
                     </label>
-                    <input pInputText [(ngModel)]="infosClient.telephone" type="tel" placeholder="+225 XX XX XX XX" class="sc-input" />
+                    <div class="sc-phone-row">
+                        <p-select
+                            [options]="paysList"
+                            [(ngModel)]="paysSelectionne"
+                            optionLabel="label"
+                            [filter]="true"
+                            filterBy="nom,indicatif"
+                            appendTo="body"
+                            styleClass="sc-pays-select"
+                            placeholder="Pays">
+                            <ng-template pTemplate="selectedItem" let-p>
+                                <span class="sc-pays-option">{{ p?.drapeau }} {{ p?.indicatif }}</span>
+                            </ng-template>
+                            <ng-template pTemplate="item" let-p>
+                                <span class="sc-pays-option">{{ p?.drapeau }} {{ p?.nom }} ({{ p?.indicatif }})</span>
+                            </ng-template>
+                        </p-select>
+                        <input pInputText
+                               [(ngModel)]="infosClient.telephone"
+                               (ngModelChange)="onTelephoneChange()"
+                               type="tel"
+                               inputmode="numeric"
+                               pattern="[0-9]*"
+                               placeholder="Ex: 0796000000"
+                               class="sc-input sc-phone-input"
+                               [class.sc-input--error]="telephoneErreur"
+                               maxlength="15" />
+                    </div>
+                    <small class="sc-phone-error" *ngIf="telephoneErreur">{{ telephoneErreur }}</small>
+                    <small class="sc-phone-hint" *ngIf="!telephoneErreur && infosClient.telephone">
+                        Numéro complet : <strong>{{ numeroComplet }}</strong>
+                    </small>
+                </div>
+
+                <!-- Confirmation WhatsApp -->
+                <div class="sc-field sc-whatsapp-confirm" *ngIf="infosClient.telephone && !telephoneErreur">
+                    <label class="sc-opt-check sc-wa-check">
+                        <p-checkbox [binary]="true" [(ngModel)]="infosClient.numeroWhatsappConfirme"></p-checkbox>
+                        <span>
+                            Je confirme que <strong>{{ numeroComplet }}</strong> est actif sur
+                            <strong style="color:#25D366">WhatsApp</strong> ou <strong style="color:#25D366">WhatsApp Business</strong>
+                        </span>
+                    </label>
+                    <small class="sc-wa-warning" *ngIf="infosClient.telephone && !infosClient.numeroWhatsappConfirme">
+                        ⚠️ Votre commande sera annulée si ce numéro n'est pas joignable sur WhatsApp.
+                    </small>
                 </div>
 
                 <div class="sc-field">
@@ -326,16 +383,16 @@ interface InfosClient {
                     <button class="sc-btn sc-btn--ghost" (click)="dialogCommandeVisible = false">Annuler</button>
                     @if (modePaiement === 'mobilemoney') {
                         <button class="sc-btn sc-btn--mobilemoney sc-btn--lg"
-                                [disabled]="!infosClient.nom || !infosClient.telephone || !infosClient.adresse"
-                                [class.sc-btn--disabled]="!infosClient.nom || !infosClient.telephone || !infosClient.adresse"
+                                [disabled]="!formulaireValide"
+                                [class.sc-btn--disabled]="!formulaireValide"
                                 (click)="envoyerCommande()">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
                             Confirmer &amp; Voir instructions de paiement
                         </button>
                     } @else {
                         <button class="sc-btn sc-btn--whatsapp sc-btn--lg"
-                                [disabled]="!infosClient.nom || !infosClient.telephone || !infosClient.adresse"
-                                [class.sc-btn--disabled]="!infosClient.nom || !infosClient.telephone || !infosClient.adresse"
+                                [disabled]="!formulaireValide"
+                                [class.sc-btn--disabled]="!formulaireValide"
                                 (click)="envoyerCommande()">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
                             Envoyer sur WhatsApp
@@ -736,6 +793,33 @@ interface InfosClient {
             font-style: normal;
             color: #9e9490;
             font-size: 0.75rem;
+        }
+
+        /* ── PrimeNG Checkbox override : affichage correct de l'état checked ── */
+        ::ng-deep .sc-options .p-checkbox .p-checkbox-box {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #d1d5db;
+            border-radius: 4px;
+            background: #ffffff;
+            transition: all 0.18s ease;
+        }
+        ::ng-deep .sc-options .p-checkbox .p-checkbox-box:hover {
+            border-color: #FF4500;
+        }
+        ::ng-deep .sc-options .p-checkbox.p-highlight .p-checkbox-box,
+        ::ng-deep .sc-options .p-checkbox .p-checkbox-box.p-highlight {
+            background: #FF4500 !important;
+            border-color: #FF4500 !important;
+        }
+        ::ng-deep .sc-options .p-checkbox.p-highlight .p-checkbox-box .p-checkbox-icon,
+        ::ng-deep .sc-options .p-checkbox .p-checkbox-box.p-highlight .p-checkbox-icon {
+            color: #ffffff !important;
+            font-size: 11px;
+        }
+        ::ng-deep .sc-options .p-checkbox:not(.p-disabled):has(.p-checkbox-input:focus-visible) .p-checkbox-box {
+            outline: 2px solid rgba(255, 69, 0, 0.35);
+            outline-offset: 2px;
         }
 
         .sc-flocage-inputs {
@@ -1156,6 +1240,28 @@ interface InfosClient {
             .sc-page-header__inner { padding: 1.5rem 1rem 1.2rem; }
         }
 
+        /* ── Champ téléphone + indicatif ── */
+        .sc-phone-row { display: flex; gap: 0.5rem; align-items: stretch; }
+        .sc-phone-input { flex: 1; }
+        .sc-input--error { border-color: #ef4444 !important; }
+        .sc-phone-error { font-size: 0.75rem; color: #ef4444; margin-top: 0.2rem; display: block; }
+        .sc-phone-hint  { font-size: 0.75rem; color: #6b7280; margin-top: 0.2rem; display: block; }
+        .sc-pays-option { font-size: 0.85rem; }
+
+        /* PrimeNG Select (indicatif) override */
+        ::ng-deep .sc-pays-select.p-select { min-width: 110px; max-width: 120px; background: #fff !important; border: 1px solid #ddd8d0 !important; border-radius: 0.6rem !important; }
+        ::ng-deep .sc-pays-select .p-select-label { font-size: 0.85rem !important; padding: 0.65rem 0.7rem !important; }
+
+        /* Confirmation WhatsApp */
+        .sc-whatsapp-confirm { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 0.6rem; padding: 0.75rem; }
+        .sc-wa-check { font-size: 0.83rem; color: #166534; }
+        .sc-wa-check strong { color: #15803d; }
+        .sc-wa-warning { font-size: 0.75rem; color: #d97706; margin-top: 0.4rem; display: block; }
+
+        /* PrimeNG Checkbox dans confirmation */
+        ::ng-deep .sc-whatsapp-confirm .p-checkbox .p-checkbox-box { border-color: #16a34a; border-radius: 4px; }
+        ::ng-deep .sc-whatsapp-confirm .p-checkbox.p-highlight .p-checkbox-box { background: #16a34a !important; border-color: #16a34a !important; }
+
         /* Petit mobile (≤ 480px) */
         @media (max-width: 480px) {
             .sc-shell { padding-bottom: 2rem; }
@@ -1183,7 +1289,75 @@ export class ShoppingCartComponent implements OnInit {
     dialogCommandeVisible = false;
     optionsOuverts = new Set<string>();
 
-    infosClient: InfosClient = { nom: '', telephone: '', adresse: '', lienGps: '', notes: '' };
+    infosClient: InfosClient = {
+        nom: '', indicatif: '+225', telephone: '',
+        adresse: '', lienGps: '', notes: '',
+        numeroWhatsappConfirme: false
+    };
+
+    // ── Téléphone / pays ──────────────────────────────────────────────────
+    telephoneErreur = '';
+
+    readonly paysList = [
+        { code: 'CI', nom: 'Côte d\'Ivoire', indicatif: '+225', drapeau: '🇨🇮', longueurMin: 8, longueurMax: 10 },
+        { code: 'SN', nom: 'Sénégal',        indicatif: '+221', drapeau: '🇸🇳', longueurMin: 9, longueurMax: 9  },
+        { code: 'ML', nom: 'Mali',            indicatif: '+223', drapeau: '🇲🇱', longueurMin: 8, longueurMax: 8  },
+        { code: 'BF', nom: 'Burkina Faso',    indicatif: '+226', drapeau: '🇧🇫', longueurMin: 8, longueurMax: 8  },
+        { code: 'GN', nom: 'Guinée',          indicatif: '+224', drapeau: '🇬🇳', longueurMin: 9, longueurMax: 9  },
+        { code: 'TG', nom: 'Togo',            indicatif: '+228', drapeau: '🇹🇬', longueurMin: 8, longueurMax: 8  },
+        { code: 'BJ', nom: 'Bénin',           indicatif: '+229', drapeau: '🇧🇯', longueurMin: 8, longueurMax: 8  },
+        { code: 'GH', nom: 'Ghana',           indicatif: '+233', drapeau: '🇬🇭', longueurMin: 9, longueurMax: 9  },
+        { code: 'NG', nom: 'Nigeria',         indicatif: '+234', drapeau: '🇳🇬', longueurMin: 10, longueurMax: 10 },
+        { code: 'CM', nom: 'Cameroun',        indicatif: '+237', drapeau: '🇨🇲', longueurMin: 9, longueurMax: 9  },
+        { code: 'GA', nom: 'Gabon',           indicatif: '+241', drapeau: '🇬🇦', longueurMin: 7, longueurMax: 8  },
+        { code: 'CG', nom: 'Congo',           indicatif: '+242', drapeau: '🇨🇬', longueurMin: 9, longueurMax: 9  },
+        { code: 'CD', nom: 'RD Congo',        indicatif: '+243', drapeau: '🇨🇩', longueurMin: 9, longueurMax: 9  },
+        { code: 'MR', nom: 'Mauritanie',      indicatif: '+222', drapeau: '🇲🇷', longueurMin: 8, longueurMax: 8  },
+        { code: 'FR', nom: 'France',          indicatif: '+33',  drapeau: '🇫🇷', longueurMin: 9, longueurMax: 9  },
+        { code: 'BE', nom: 'Belgique',        indicatif: '+32',  drapeau: '🇧🇪', longueurMin: 8, longueurMax: 9  },
+        { code: 'MA', nom: 'Maroc',           indicatif: '+212', drapeau: '🇲🇦', longueurMin: 9, longueurMax: 9  },
+        { code: 'DZ', nom: 'Algérie',         indicatif: '+213', drapeau: '🇩🇿', longueurMin: 9, longueurMax: 9  },
+        { code: 'TN', nom: 'Tunisie',         indicatif: '+216', drapeau: '🇹🇳', longueurMin: 8, longueurMax: 8  },
+        { code: 'US', nom: 'États-Unis',      indicatif: '+1',   drapeau: '🇺🇸', longueurMin: 10, longueurMax: 10 },
+        { code: 'CA', nom: 'Canada',          indicatif: '+1',   drapeau: '🇨🇦', longueurMin: 10, longueurMax: 10 },
+    ];
+
+    paysSelectionne = this.paysList[0]; // Côte d'Ivoire par défaut
+
+    get numeroComplet(): string {
+        const digits = (this.infosClient.telephone ?? '').replace(/\D/g, '');
+        if (!digits) return '';
+        return `${this.paysSelectionne.indicatif}${digits}`;
+    }
+
+    get formulaireValide(): boolean {
+        return !!(
+            this.infosClient.nom?.trim() &&
+            this.infosClient.telephone?.trim() &&
+            !this.telephoneErreur &&
+            this.infosClient.numeroWhatsappConfirme &&
+            this.infosClient.adresse?.trim()
+        );
+    }
+
+    onTelephoneChange(): void {
+        const digits = (this.infosClient.telephone ?? '').replace(/\D/g, '');
+        const pays = this.paysSelectionne;
+        if (!digits) {
+            this.telephoneErreur = '';
+            return;
+        }
+        if (digits.length < pays.longueurMin) {
+            this.telephoneErreur = `Numéro trop court — min ${pays.longueurMin} chiffres pour ${pays.nom}.`;
+        } else if (digits.length > pays.longueurMax) {
+            this.telephoneErreur = `Numéro trop long — max ${pays.longueurMax} chiffres pour ${pays.nom}.`;
+        } else {
+            this.telephoneErreur = '';
+        }
+        // Reset confirmation si numéro change
+        this.infosClient.numeroWhatsappConfirme = false;
+    }
+    // ─────────────────────────────────────────────────────────────────────
 
     ngOnInit(): void {}
 
@@ -1259,7 +1433,7 @@ export class ShoppingCartComponent implements OnInit {
 
         const commande = {
             clientNom: this.infosClient.nom,
-            clientTelephone: this.infosClient.telephone,
+            clientTelephone: this.numeroComplet,
             clientAdresse: this.infosClient.adresse,
             notes: this.infosClient.notes,
             lignes: articles.map((a) => ({
