@@ -11,6 +11,7 @@ import com.shop.droping.presentation.dto.WhatsAppLinkDto;
 import com.shop.droping.repository.CommandeRepository;
 import com.shop.droping.repository.ConfigurationRepository;
 import com.shop.droping.repository.ProduitRepository;
+import com.shop.droping.repository.UtilisateurRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,13 +28,25 @@ public class CommandeFacade {
     private final CommandeRepository commandeRepository;
     private final ProduitRepository produitRepository;
     private final ConfigurationRepository configurationRepository;
+    private final UtilisateurRepository utilisateurRepository;
 
     public CommandeFacade(CommandeRepository commandeRepository,
                          ProduitRepository produitRepository,
-                         ConfigurationRepository configurationRepository) {
+                         ConfigurationRepository configurationRepository,
+                         UtilisateurRepository utilisateurRepository) {
         this.commandeRepository = commandeRepository;
         this.produitRepository = produitRepository;
         this.configurationRepository = configurationRepository;
+        this.utilisateurRepository = utilisateurRepository;
+    }
+
+    private String getNumeroWhatsApp() {
+        return utilisateurRepository.findFirstByRecevoirCommandesTrue()
+                .map(u -> u.getTelephone())
+                .filter(t -> t != null && !t.isBlank())
+                .orElseGet(() -> configurationRepository.findByCle(Configuration.CLE_WHATSAPP_NUMERO)
+                        .map(Configuration::getValeur)
+                        .orElse("+2250799136306"));
     }
 
     public List<CommandeDto> listerToutesLesCommandes() {
@@ -115,9 +128,7 @@ public class CommandeFacade {
         Commande commande = commandeRepository.findByIdWithLignes(commandeId)
             .orElseThrow(() -> new RuntimeException("Commande non trouvée avec l'ID: " + commandeId));
 
-        String numeroWhatsApp = configurationRepository.findByCle(Configuration.CLE_WHATSAPP_NUMERO)
-            .map(Configuration::getValeur)
-            .orElse("+2250799136306");
+        String numeroWhatsApp = getNumeroWhatsApp();
 
         String nomBoutique = configurationRepository.findByCle(Configuration.CLE_NOM_BOUTIQUE)
             .map(Configuration::getValeur)
@@ -177,9 +188,7 @@ public class CommandeFacade {
 
     public WhatsAppLinkDto genererLienWhatsAppPanier(List<CreerCommandeRequest.LigneRequest> lignes,
                                                      String clientNom, String clientTelephone) {
-        String numeroWhatsApp = configurationRepository.findByCle(Configuration.CLE_WHATSAPP_NUMERO)
-            .map(Configuration::getValeur)
-            .orElse("+2250799136306");
+        String numeroWhatsApp = getNumeroWhatsApp();
 
         String nomBoutique = configurationRepository.findByCle(Configuration.CLE_NOM_BOUTIQUE)
             .map(Configuration::getValeur)

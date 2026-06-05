@@ -12,4 +12,6 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> 
 
 	@Query("SELECT u FROM Utilisateur u WHERE trim(both from u.username) = :username")
 	Optional<Utilisateur> rechercherParUsername(String username);
+
+	Optional<Utilisateur> findFirstByRecevoirCommandesTrue();
 }

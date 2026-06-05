@@ -34,6 +34,12 @@ public class Utilisateur extends AbstractEntity {
 	@Enumerated(EnumType.STRING)
 	private StatutUtilisateur statut;
 
+	@Column(name = "telephone", length = 20)
+	private String telephone;
+
+	@Column(name = "recevoir_commandes")
+	private Boolean recevoirCommandes;
+
 
 	public User buildUser() {
 		return new User(getUsername(), getPassword(), singleton(new SimpleGrantedAuthority(getRole().name())));
@@ -87,6 +93,13 @@ public class Utilisateur extends AbstractEntity {
 		return statut;
 	}
 
+	public String getTelephone() {
+		return telephone;
+	}
+
+	public Boolean getRecevoirCommandes() {
+		return recevoirCommandes;
+	}
 
 	public void setPassword(String password) {
 		this.password = password;
