@@ -28,6 +28,7 @@ public class SecurityConfig {
             "/api/categories",
             "/api/categories/**",
             "/api/commandes/suivi/**",
+            "/api/config/**",
             "/assets/**",
             "/images/**",
             "/uploads/**",

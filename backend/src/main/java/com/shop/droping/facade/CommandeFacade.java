@@ -40,7 +40,7 @@ public class CommandeFacade {
         this.utilisateurRepository = utilisateurRepository;
     }
 
-    private String getNumeroWhatsApp() {
+    public String getNumeroWhatsApp() {
         return utilisateurRepository.findFirstByRecevoirCommandesTrue()
                 .map(u -> u.getTelephone())
                 .filter(t -> t != null && !t.isBlank())

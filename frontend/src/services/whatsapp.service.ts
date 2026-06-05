@@ -1,13 +1,36 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WhatsappService {
-  private readonly numeroVendeur = '+2250799136306';
+  private numeroVendeur = '+2250799136306'; // fallback si l'API est indisponible
+  private readonly http = inject(HttpClient);
   private readonly backofficeUrl = environment.backOfficeUrl;
   private readonly frontofficeUrl = environment.url;
+  private readonly apiUrl = environment.apiUrl;
+
+  constructor() {
+    this.chargerNumeroDuBackend();
+  }
+
+  private chargerNumeroDuBackend(): void {
+    this.http.get<{ numero: string }>(`${this.apiUrl}/config/numero-whatsapp`)
+      .subscribe({
+        next: (res) => {
+          if (res?.numero && res.numero.trim().length > 0) {
+            this.numeroVendeur = res.numero;
+          }
+        },
+        error: () => { /* garde le fallback */ }
+      });
+  }
+
+  getNumero(): string {
+    return this.numeroVendeur;
+  }
 
   creerMessageCommande(commande: any, commandeId: number, commandeNumero?: string): string {
     const ref = commandeNumero ? `N° ${commandeNumero}` : `#${commandeId}`;

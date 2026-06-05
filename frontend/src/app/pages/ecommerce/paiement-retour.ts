@@ -1,7 +1,8 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { PaiementService } from '@services/paiement.service';
+import { WhatsappService } from '@services/whatsapp.service';
 
 @Component({
     selector: 'app-paiement-retour',
@@ -126,6 +127,7 @@ export class PaiementRetourComponent implements OnInit {
     commandeNumero = signal('');
     private transactionId = '';
     private commandeId = '';
+    private whatsappService = inject(WhatsappService);
 
     constructor(
         private route: ActivatedRoute,
@@ -166,6 +168,8 @@ export class PaiementRetourComponent implements OnInit {
     }
 
     contacterWhatsApp(): void {
-        window.open('https://wa.me/2250799136306?text=Bonjour%2C%20j%27ai%20un%20probl%C3%A8me%20avec%20mon%20paiement.', '_blank');
+        const numero = this.whatsappService.getNumero().replace(/[^0-9]/g, '');
+        const msg = encodeURIComponent('Bonjour, j\'ai un problème avec mon paiement.');
+        window.open(`https://wa.me/${numero}?text=${msg}`, '_blank');
     }
 }

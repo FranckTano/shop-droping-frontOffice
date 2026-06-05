@@ -1,8 +1,9 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommandeService } from '@services/commande.service';
+import { WhatsappService } from '@services/whatsapp.service';
 
 interface EtapeTimeline {
     statut: string;
@@ -357,6 +358,8 @@ export class SuiviCommandeComponent implements OnInit {
 
     readonly etapes = ETAPES;
 
+    private whatsappService = inject(WhatsappService);
+
     constructor(
         private commandeService: CommandeService,
         private router: Router,
@@ -409,7 +412,7 @@ export class SuiviCommandeComponent implements OnInit {
     }
 
     contacterWhatsApp(): void {
-        const numero = '+2250799136306';
+        const numero = this.whatsappService.getNumero();
         const msg = this.commande()
             ? `Bonjour, j'ai une question concernant ma commande ${this.commande()!.numero}.`
             : 'Bonjour, j\'ai une question sur ma commande.';
