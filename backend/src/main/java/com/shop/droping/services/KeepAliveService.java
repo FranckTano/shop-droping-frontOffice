@@ -18,6 +18,8 @@ public class KeepAliveService {
 
     private static final Logger log = LoggerFactory.getLogger(KeepAliveService.class);
 
+    private static final RestTemplate REST_TEMPLATE = new RestTemplate();
+
     @Value("${keepalive.target-url:}")
     private String targetUrl;
 
@@ -27,8 +29,7 @@ public class KeepAliveService {
             return;
         }
         try {
-            RestTemplate restTemplate = new RestTemplate();
-            restTemplate.getForObject(targetUrl, String.class);
+            REST_TEMPLATE.getForObject(targetUrl, String.class);
             log.info("[KeepAlive] Ping OK → {}", targetUrl);
         } catch (Exception e) {
             log.warn("[KeepAlive] Ping échoué → {} : {}", targetUrl, e.getMessage());

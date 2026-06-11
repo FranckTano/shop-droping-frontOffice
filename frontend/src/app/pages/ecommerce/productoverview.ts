@@ -8,6 +8,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { ProduitService, Produit } from '@services/produit.service';
 import { PanierService, OptionsMaillot } from '@services/panier.service';
 import { AnalyticsService } from '@services/analytics.service';
+import { MetaService } from '@services/meta.service';
 
 @Component({
     selector: 'app-product-overview',
@@ -1165,6 +1166,7 @@ export class ProductOverviewComponent implements OnInit {
     private panierService  = inject(PanierService);
     private messageService = inject(MessageService);
     private analytics      = inject(AnalyticsService);
+    private metaService    = inject(MetaService);
 
     produit: Produit | null = null;
     chargement = true;
@@ -1196,6 +1198,7 @@ export class ProductOverviewComponent implements OnInit {
                 this.tailleSelectionnee   = this.taillesDisponibles[0];
                 this.couleurSelectionnee  = this.couleursDisponibles[0];
                 this.chargement = false;
+                this.metaService.setProduit(data.nom, data.description ?? null, data.imageUrl ?? null, data.id, data.prix);
                 this.analytics.trackViewItem({ id: data.id, nom: data.nom, prix: data.prix });
             },
             error: () => {

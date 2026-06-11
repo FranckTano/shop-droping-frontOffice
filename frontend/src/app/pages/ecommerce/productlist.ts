@@ -14,6 +14,7 @@ import { CarouselModule } from 'primeng/carousel';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { MessageService } from 'primeng/api';
 import { PanierService } from '@services/panier.service';
+import { MetaService } from '@services/meta.service';
 
 type OngletId = 'tous' | 'actuel' | 'vintage-court' | 'vintage-long' | 'collection';
 type VueMode = 'grid-classic' | 'grid-premium' | 'masonry' | 'list' | 'mini' | 'showcase';
@@ -1436,6 +1437,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
     private route          = inject(ActivatedRoute);
     private panierService  = inject(PanierService);
     private messageService = inject(MessageService);
+    private metaService    = inject(MetaService);
 
     statNbMaillots = 0;
 
@@ -1459,6 +1461,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.metaService.setBoutique();
         /* Restaurer la vue sauvegardée */
         const savedVue = localStorage.getItem('shop_droping_vue_mode') as VueMode | null;
         if (savedVue && this.rowsParMode[savedVue] !== undefined) {

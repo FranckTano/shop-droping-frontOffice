@@ -20,6 +20,7 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 public class SecurityConfig {
 
     private final JwtRequestFilter jwtRequestFilter;
+    private final LoginRateLimitFilter loginRateLimitFilter;
     private final LogoutHandler logoutHandler;
 
     private static final String[] PUBLIC_GET = {
@@ -55,8 +56,11 @@ public class SecurityConfig {
             "/websocket/**"
     };
 
-    public SecurityConfig(JwtRequestFilter jwtRequestFilter, LogoutHandler logoutHandler) {
+    public SecurityConfig(JwtRequestFilter jwtRequestFilter,
+                          LoginRateLimitFilter loginRateLimitFilter,
+                          LogoutHandler logoutHandler) {
         this.jwtRequestFilter = jwtRequestFilter;
+        this.loginRateLimitFilter = loginRateLimitFilter;
         this.logoutHandler = logoutHandler;
     }
 
@@ -82,6 +86,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(loginRateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(logout -> logout
                         .logoutUrl("/ws/auth/logout")

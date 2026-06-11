@@ -16,6 +16,8 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import com.shop.droping.exception.UtilisateurException;
+
 import static com.shop.droping.exception.configuration.CodeErreurTechnique.ACCES_REFUSE;
 import static com.shop.droping.exception.configuration.CodeErreurTechnique.AUCUN_RESULTAT;
 import static com.shop.droping.exception.configuration.CodeErreurTechnique.ERREUR_INCONNUE;
@@ -105,6 +107,14 @@ public class ExceptionHandlers extends ResponseEntityExceptionHandler {
 
 		log.warn(ex.getMessageAvecCode());
 		log.warn(ex.getMessage(), ex);
+		setReponseJson(ex.getApplicationErreur(), response);
+	}
+
+	@ExceptionHandler(UtilisateurException.class)
+	public void handleUtilisateurException(UtilisateurException ex, HttpServletResponse response) {
+		// 401 pour les erreurs d'auth — évite de retourner 500 sur mauvais credentials
+		response.setStatus(HttpStatus.UNAUTHORIZED.value());
+		log.warn(ex.getMessageAvecCode());
 		setReponseJson(ex.getApplicationErreur(), response);
 	}
 

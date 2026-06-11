@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Page principale boutique -->
+  <url>
+    <loc>https://momo-store.shop/boutique</loc>
+    <lastmod>2026-06-01</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Suivi de commande -->
+  <url>
+    <loc>https://momo-store.shop/boutique/ma-commande</loc>
+    <lastmod>2026-06-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Note : les URLs de produits individuels sont dynamiques.
+       Pour un sitemap de produits complet, générez-le côté serveur
+       via /api/produits et concaténez avec ce fichier. -->
+
+</urlset>

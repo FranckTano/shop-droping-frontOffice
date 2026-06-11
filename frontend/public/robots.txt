@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /boutique
+Allow: /boutique/product-overview/
+Disallow: /boutique/panier
+Disallow: /boutique/paiement-retour
+Disallow: /boutique/ma-commande
+Disallow: /connexion
+Disallow: /admin
+Disallow: /notfound
+
+Sitemap: https://momo-store.shop/sitemap.xml

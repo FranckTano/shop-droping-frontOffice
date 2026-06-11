@@ -21,21 +21,17 @@ public class UtilisateurException extends AbstractApplicationException {
 	 * Exception levée si aucun utilisateur n'est trouvé.
 	 */
 	public static UtilisateurException motDePasseIncorrect() {
-		return new UtilisateurException(CodeErreurTechnique.MOT_DE_PASSE_INCORRECT, "Le mot de passe saisi est incorrect");
+		// Message identique à utiilisateurInconnu pour empêcher l'énumération des comptes
+		return new UtilisateurException(CodeErreurTechnique.MOT_DE_PASSE_INCORRECT, "Identifiants incorrects");
 	}
 
-	/**
-	 * Exception levée si aucun utilisateur n'est trouvé.
-	 */
 	public static UtilisateurException utilisateurInactif() {
 		return new UtilisateurException(CodeErreurTechnique.UTILISATEUR_INNACTIF, "Cet utilisateur est inactif. Contactez votre administrateur");
 	}
 
-	/**
-	 * Exception levée si aucun utilisateur n'est trouvé.
-	 */
 	public static UtilisateurException utiilisateurInconnu(String nomUtilisateur) {
-		return new UtilisateurException(CodeErreurTechnique.UTILISATEUR_INCONNU, "Aucun utilisateur trouvé avec le login %s", singleton(nomUtilisateur));
+		// Même message que motDePasseIncorrect — ne pas révéler si le login existe
+		return new UtilisateurException(CodeErreurTechnique.UTILISATEUR_INCONNU, "Identifiants incorrects");
 	}
 
 	/**
