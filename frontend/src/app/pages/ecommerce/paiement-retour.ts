@@ -31,7 +31,7 @@ import { WhatsappService } from '@services/whatsapp.service';
                         </div>
                         <h1>Paiement réussi !</h1>
                         <p>Votre commande <strong>{{ commandeNumero() }}</strong> a bien été payée.</p>
-                        <p class="pr-hint">Vous recevrez une confirmation via WhatsApp. Délai de livraison : 2–5 jours ouvrés.</p>
+                        <p class="pr-hint">Vous recevrez une confirmation via WhatsApp. Délai de livraison : 2 jours max.</p>
                         <div class="pr-actions">
                             <button class="pr-btn pr-btn--primary" (click)="allerAuSuivi()">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>

@@ -273,7 +273,7 @@ type VueMode = 'grid-classic' | 'grid-premium' | 'masonry' | 'list' | 'mini' | '
                             </div>
                             <div class="pl-card__sur-commande">
                                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                Sur commande · 2–5 j
+                                Sur commande · 2 j max
                             </div>
                             <div class="pl-card__footer">
                                 <div class="pl-card__price">
@@ -367,7 +367,7 @@ type VueMode = 'grid-classic' | 'grid-premium' | 'masonry' | 'list' | 'mini' | '
                             </div>
                             <div class="pl-card__sur-commande">
                                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                Sur commande · 2–5 j
+                                Sur commande · 2 j max
                             </div>
                             <div class="pl-card__footer">
                                 <div class="pl-card__price">

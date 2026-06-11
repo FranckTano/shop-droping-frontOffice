@@ -118,7 +118,7 @@ import { AnalyticsService } from '@services/analytics.service';
                         </div>
                         <div class="po-feature">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-                            Livraison 2–5 jours
+                            Livraison 2 jours max
                         </div>
                     </div>
                 </div>
@@ -138,7 +138,7 @@ import { AnalyticsService } from '@services/analytics.service';
                         <!-- Badges Sur commande -->
                         <div class="po-sur-commande">
                             <span class="po-sur-commande__badge">⏱ Sur commande</span>
-                            <span class="po-sur-commande__delai">🚚 2–5 jours</span>
+                            <span class="po-sur-commande__delai">🚚 2 jours max</span>
                         </div>
                     </div>
 
@@ -308,7 +308,7 @@ import { AnalyticsService } from '@services/analytics.service';
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
                                     </div>
                                     <div>
-                                        <strong>Livraison 2–5 jours</strong>
+                                        <strong>Livraison 2 jours max</strong>
                                         <p>À domicile ou en point relais à Abidjan. Frais confirmés via WhatsApp.</p>
                                     </div>
                                 </div>

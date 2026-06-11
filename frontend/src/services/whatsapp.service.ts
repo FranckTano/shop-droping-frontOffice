@@ -62,7 +62,7 @@ export class WhatsappService {
 
     message += `━━━━━━━━━━━━━━━━━━━━━\n`;
     message += `💵 *TOTAL: ${this.formatPrix(commande.montantTotal)} FCFA*\n\n`;
-    message += `⏱️ *Délai de livraison : 2–5 jours ouvrés* après confirmation\n`;
+    message += `⏱️ *Délai de livraison : 2 jours max* après confirmation\n`;
     message += `📦 Produits sur commande — préparation sous 24h\n\n`;
     message += `Merci pour votre commande ! 🙏\n\n`;
     message += `━━━━━━━━━━━━━━━━━━━━━\n`;
