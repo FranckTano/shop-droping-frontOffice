@@ -116,6 +116,25 @@ export class WhatsappService {
     window.location.href = this.construireLien(message);
   }
 
+  /** Ouvre une discussion WhatsApp directe avec un numéro client */
+  contacterClient(telephone: string, message: string = ''): void {
+    const clean = this.formaterNumeroCI(telephone);
+    const url = message
+      ? `https://wa.me/${clean}?text=${encodeURIComponent(message)}`
+      : `https://wa.me/${clean}`;
+    window.open(url, '_blank');
+  }
+
+  /** Formate un numéro CI (225) pour wa.me — enlève le 0 initial si présent */
+  formaterNumeroCI(tel: string): string {
+    if (!tel) return '';
+    const digits = tel.replace(/[^0-9]/g, '');
+    if (digits.startsWith('225')) return digits;
+    if (digits.startsWith('00225')) return digits.slice(2);
+    if (digits.startsWith('0')) return '225' + digits.slice(1);
+    return '225' + digits;
+  }
+
   private formatPrix(prix: number): string {
     return new Intl.NumberFormat('fr-FR').format(prix);
   }

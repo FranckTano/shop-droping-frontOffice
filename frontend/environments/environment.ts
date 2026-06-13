@@ -1,6 +1,6 @@
 export const environment = {
     production: false,
     apiUrl: 'http://localhost:8080/api',
-    url: 'http://localhost:4400',
+    url: 'http://localhost:3000',
     backOfficeUrl: 'http://localhost:4480'
 };
