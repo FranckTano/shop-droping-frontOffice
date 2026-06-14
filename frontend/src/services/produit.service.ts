@@ -149,7 +149,7 @@ export class ProduitService {
           .map((taille) => (taille?.taille ?? '').trim())
       : [];
 
-    return mapped.length > 0 ? mapped : ['S', 'M', 'L', 'XL'];
+    return mapped.length > 0 ? mapped : ['M', 'L', 'XL', 'XXL'];
   }
 
   private mapCouleurs(couleurs?: string[]): string[] {

@@ -1180,7 +1180,7 @@ export class ProductOverviewComponent implements OnInit {
     flocageNom = '';
     flocageNumero = '';
 
-    taillesDisponibles: string[] = ['S', 'M', 'L', 'XL'];
+    taillesDisponibles: string[] = ['M', 'L', 'XL', 'XXL'];
     couleursDisponibles: string[] = ['Standard'];
     readonly prixBadgesOfficiels = 500;
     readonly prixFlocageParLettre = 500;
@@ -1193,7 +1193,7 @@ export class ProductOverviewComponent implements OnInit {
         this.produitService.getProduitById(id).subscribe({
             next: (data) => {
                 this.produit = data;
-                this.taillesDisponibles    = data.taillesDisponibles?.length  ? data.taillesDisponibles  : ['S', 'M', 'L', 'XL'];
+                this.taillesDisponibles    = data.taillesDisponibles?.length  ? data.taillesDisponibles  : ['M', 'L', 'XL', 'XXL'];
                 this.couleursDisponibles   = data.couleursDisponibles?.length ? data.couleursDisponibles : ['Standard'];
                 this.tailleSelectionnee   = this.taillesDisponibles[0];
                 this.couleurSelectionnee  = this.couleursDisponibles[0];

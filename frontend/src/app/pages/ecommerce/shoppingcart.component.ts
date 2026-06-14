@@ -1270,7 +1270,7 @@ interface Pays {
     `]
 })
 export class ShoppingCartComponent implements OnInit {
-    private readonly taillesStandards = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'];
+    private readonly taillesStandards = ['M', 'L', 'XL', 'XXL', '3XL'];
     private readonly taillesSelectionCache = new Map<string, { raw: string; values: string[] }>();
 
     public panierService = inject(PanierService);
